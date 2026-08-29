@@ -64,10 +64,10 @@ export const LoginView: React.FC = () => {
       return;
     }
 
-    // Security Verification: Only faatesp.professor.rogerioaugusto@gmail.com can log in as Professor
+    // Security Verification: Only authorized professor email can log in as Professor
     if (isProfessorGroup(groupToUse) && !isProfessorEmail(cleanEmail)) {
       setErrorMsg(
-        `Acesso Restrito ao Grupo Professor: Apenas o e-mail oficial (${PROFESSOR_AUTHORIZED_EMAIL}) tem permissão para acessar o perfil de Professor. Por favor, selecione seu grupo (Grupo 01 a 05).`
+        'Acesso Restrito ao Perfil Docente: Este ambiente é exclusivo da coordenação e supervisão docente. Por favor, selecione o seu respectivo grupo de consultoria (Grupo 01 ao Grupo 05).'
       );
       return;
     }
@@ -253,9 +253,9 @@ export const LoginView: React.FC = () => {
                   <div className="mt-2 p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] flex items-start gap-2">
                     <Lock className="w-3.5 h-3.5 mt-0.5 shrink-0 text-amber-400" />
                     <div>
-                      <strong className="font-semibold">Perfil Docente Restrito:</strong> Apenas o e-mail{' '}
-                      <span className="font-mono text-amber-200 font-bold">{PROFESSOR_AUTHORIZED_EMAIL}</span> possui
-                      permissão para acessar este ambiente. Alunos devem entrar pelo <strong>Grupo 01 ao Grupo 05</strong>.
+                      <strong className="font-semibold">Perfil Docente Restrito:</strong> Ambiente de acesso restrito
+                      e exclusivo à coordenação e docência. Alunos devem entrar selecionando o seu respectivo grupo (
+                      <strong>Grupo 01 ao Grupo 05</strong>).
                     </div>
                   </div>
                 )}

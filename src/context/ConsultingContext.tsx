@@ -598,10 +598,10 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       return;
     }
 
-    // Security Restriction: Only faatesp.professor.rogerioaugusto@gmail.com can access the Professor group/role
+    // Security Restriction: Only authorized professor email can access the Professor group/role
     if (isProfessorGroup(cleanGroup) && !isProfessorEmail(cleanEmail)) {
       showToast(
-        'Acesso Restrito: Apenas o e-mail oficial do professor (faatesp.professor.rogerioaugusto@gmail.com) tem permissão para acessar o grupo Professor.',
+        'Acesso Restrito: Este ambiente é exclusivo da coordenação e docência. Por favor, acesse através do seu grupo de consultoria.',
         'error'
       );
       return;
@@ -679,7 +679,7 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     // Security Restriction on switching groups
     if (isProfessorGroup(cleanNewGroup) && !isProfessorEmail(currentUser.email)) {
       showToast(
-        'Acesso Restrito: Apenas o e-mail oficial do professor (faatesp.professor.rogerioaugusto@gmail.com) tem permissão para acessar o grupo Professor.',
+        'Acesso Restrito: Este ambiente é exclusivo da coordenação e docência. Por favor, acesse através do seu grupo de consultoria.',
         'error'
       );
       return;
