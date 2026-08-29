@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { useConsulting, getGroupStoragePrefix } from '../../context/ConsultingContext';
+import {
+  useConsulting,
+  getGroupStoragePrefix,
+  isProfessorGroup,
+  isProfessorEmail,
+  PROFESSOR_AUTHORIZED_EMAIL,
+} from '../../context/ConsultingContext';
 import {
   Shield,
   Users,
@@ -11,13 +17,17 @@ import {
   Building2,
   PlusCircle,
   HelpCircle,
+  Lock,
+  GraduationCap,
 } from 'lucide-react';
 
 export const LoginView: React.FC = () => {
   const { availableGroups, login } = useConsulting();
 
   const [email, setEmail] = useState('');
-  const [selectedGroup, setSelectedGroup] = useState(availableGroups[0] || 'Grupo 01');
+  const [selectedGroup, setSelectedGroup] = useState(
+    availableGroups.find((g) => g === 'Grupo 01') || availableGroups[0] || 'Grupo 01'
+  );
   const [isCreatingNewGroup, setIsCreatingNewGroup] = useState(false);
   const [newGroupName, setNewGroupName] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -31,6 +41,7 @@ export const LoginView: React.FC = () => {
 
   const activeTargetGroup = isCreatingNewGroup ? newGroupName.trim() : selectedGroup;
   const isExistingGroup = checkGroupHasData(activeTargetGroup);
+  const isTargetProfessor = isProfessorGroup(activeTargetGroup);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +61,14 @@ export const LoginView: React.FC = () => {
     const groupToUse = isCreatingNewGroup ? newGroupName.trim() : selectedGroup.trim();
     if (!groupToUse) {
       setErrorMsg('Por favor, selecione um grupo existente ou digite o nome do novo grupo.');
+      return;
+    }
+
+    // Security Verification: Only faatesp.professor.rogerioaugusto@gmail.com can log in as Professor
+    if (isProfessorGroup(groupToUse) && !isProfessorEmail(cleanEmail)) {
+      setErrorMsg(
+        `Acesso Restrito ao Grupo Professor: Apenas o e-mail oficial (${PROFESSOR_AUTHORIZED_EMAIL}) tem permissão para acessar o perfil de Professor. Por favor, selecione seu grupo (Grupo 01 a 05).`
+      );
       return;
     }
 
@@ -178,22 +197,37 @@ export const LoginView: React.FC = () => {
                 {!isCreatingNewGroup ? (
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                      <Building2 className="w-4 h-4" />
+                      {isTargetProfessor ? (
+                        <GraduationCap className="w-4 h-4 text-amber-400" />
+                      ) : (
+                        <Building2 className="w-4 h-4" />
+                      )}
                     </div>
                     <select
                       id="login-group-select"
                       value={selectedGroup}
                       onChange={(e) => setSelectedGroup(e.target.value)}
-                      className="w-full pl-10 pr-10 py-2.5 bg-slate-800/90 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all cursor-pointer appearance-none"
+                      className={`w-full pl-10 pr-10 py-2.5 bg-slate-800/90 border rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-all cursor-pointer appearance-none ${
+                        isTargetProfessor
+                          ? 'border-amber-500/50 focus:ring-amber-500 text-amber-200'
+                          : 'border-slate-700 focus:ring-blue-500'
+                      }`}
                     >
-                      {availableGroups.map((grp) => (
-                        <option key={grp} value={grp} className="bg-slate-900 text-slate-100">
-                          {grp}
-                        </option>
-                      ))}
+                      {availableGroups.map((grp) => {
+                        const isProf = isProfessorGroup(grp);
+                        return (
+                          <option key={grp} value={grp} className="bg-slate-900 text-slate-100">
+                            {isProf ? `👑 ${grp} (Acesso Restrito Docente)` : `🏢 ${grp}`}
+                          </option>
+                        );
+                      })}
                     </select>
                     <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
-                      <Users className="w-4 h-4" />
+                      {isTargetProfessor ? (
+                        <Lock className="w-4 h-4 text-amber-400" />
+                      ) : (
+                        <Users className="w-4 h-4" />
+                      )}
                     </div>
                   </div>
                 ) : (
@@ -211,6 +245,18 @@ export const LoginView: React.FC = () => {
                       placeholder="Digite o nome do novo grupo ou equipe..."
                       className="w-full pl-10 pr-4 py-2.5 bg-slate-800/90 border border-emerald-500/40 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                     />
+                  </div>
+                )}
+
+                {/* Professor Info / Restriction Notice */}
+                {isTargetProfessor && (
+                  <div className="mt-2 p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] flex items-start gap-2">
+                    <Lock className="w-3.5 h-3.5 mt-0.5 shrink-0 text-amber-400" />
+                    <div>
+                      <strong className="font-semibold">Perfil Docente Restrito:</strong> Apenas o e-mail{' '}
+                      <span className="font-mono text-amber-200 font-bold">{PROFESSOR_AUTHORIZED_EMAIL}</span> possui
+                      permissão para acessar este ambiente. Alunos devem entrar pelo <strong>Grupo 01 ao Grupo 05</strong>.
+                    </div>
                   </div>
                 )}
               </div>

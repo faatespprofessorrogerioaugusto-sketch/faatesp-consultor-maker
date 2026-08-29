@@ -1,5 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useConsulting } from '../../context/ConsultingContext';
+import {
+  useConsulting,
+  isProfessorGroup,
+  isProfessorEmail,
+  PROFESSOR_AUTHORIZED_EMAIL,
+} from '../../context/ConsultingContext';
 import {
   Menu,
   Search,
@@ -20,6 +25,8 @@ import {
   RefreshCw,
   Building2,
   Trash2,
+  Lock,
+  GraduationCap,
 } from 'lucide-react';
 import { GlobalSearchModal } from '../common/GlobalSearchModal';
 import { StatusBadge } from '../common/Badge';
@@ -198,7 +205,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileSidebar }) => {
               </div>
               <div className="text-left">
                 <span className="text-[9px] uppercase font-bold text-blue-400 block leading-none">
-                  Grupo Ativo
+                  {isProfessorGroup(currentGroup) ? '👑 Ambiente Docente' : 'Grupo Ativo'}
                 </span>
                 <span className="text-xs font-bold text-white max-w-[110px] sm:max-w-[160px] truncate block leading-tight">
                   {currentGroup || 'Grupo Principal'}
@@ -217,9 +224,15 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileSidebar }) => {
                     <span className="text-[10px] uppercase font-bold text-blue-400 tracking-wider">
                       Ambiente de Grupo
                     </span>
-                    <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-semibold px-2 py-0.5 rounded-full border border-emerald-500/30">
-                      Isolamento Ativo
-                    </span>
+                    {isProfessorGroup(currentGroup) ? (
+                      <span className="text-[10px] bg-amber-500/20 text-amber-300 font-semibold px-2 py-0.5 rounded-full border border-amber-500/30">
+                        👑 Docente Autorizado
+                      </span>
+                    ) : (
+                      <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-semibold px-2 py-0.5 rounded-full border border-emerald-500/30">
+                        Isolamento Ativo
+                      </span>
+                    )}
                   </div>
                   <h4 className="text-sm font-bold text-white mt-1 truncate">{currentGroup}</h4>
                   <p className="text-[11px] text-slate-400 mt-0.5 truncate">
@@ -231,9 +244,13 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileSidebar }) => {
                   <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1 mb-1">
                     Alternar para outro Grupo:
                   </p>
-                  <div className="max-h-40 overflow-y-auto space-y-1 py-0.5">
+                  <div className="max-h-48 overflow-y-auto space-y-1 py-0.5">
                     {availableGroups.map((grp) => {
                       const isCurrent = grp === currentGroup;
+                      const isGrpProf = isProfessorGroup(grp);
+                      const isUserAllowedProf = isProfessorEmail(currentUser?.email || '');
+                      const isBlocked = isGrpProf && !isUserAllowedProf;
+
                       return (
                         <button
                           key={grp}
@@ -245,10 +262,20 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileSidebar }) => {
                           className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center justify-between transition-colors cursor-pointer ${
                             isCurrent
                               ? 'bg-blue-600/20 border border-blue-500/30 text-blue-300 font-bold'
+                              : isBlocked
+                              ? 'opacity-60 hover:opacity-100 hover:bg-rose-950/30 text-slate-400'
                               : 'hover:bg-slate-800 text-slate-300'
                           }`}
                         >
-                          <span className="truncate">{grp}</span>
+                          <div className="flex items-center gap-1.5 truncate">
+                            {isGrpProf && <GraduationCap className="w-3.5 h-3.5 text-amber-400 shrink-0" />}
+                            <span className="truncate">{grp}</span>
+                            {isBlocked && (
+                              <span className="text-[9px] px-1 py-0.2 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-0.5">
+                                <Lock className="w-2.5 h-2.5" /> Restrito
+                              </span>
+                            )}
+                          </div>
                           {isCurrent && <CheckCircle2 className="w-3.5 h-3.5 text-blue-400 shrink-0" />}
                         </button>
                       );

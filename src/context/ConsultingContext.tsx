@@ -231,7 +231,26 @@ const ConsultingContext = createContext<ConsultingContextType | undefined>(undef
 export const GROUPS_STORAGE_KEY = 'consult_hub_groups_list_v2';
 export const SESSION_STORAGE_KEY = 'consult_hub_current_session_v2';
 
+export const PROFESSOR_AUTHORIZED_EMAIL = 'faatesp.professor.rogerioaugusto@gmail.com';
+
+export const isProfessorGroup = (groupName: string): boolean => {
+  const clean = (groupName || '').trim().toLowerCase();
+  return (
+    clean === 'professor' ||
+    clean === 'grupo professor' ||
+    clean === 'professores' ||
+    clean === 'docente' ||
+    clean === 'coordenação' ||
+    clean === 'coordenacao'
+  );
+};
+
+export const isProfessorEmail = (email: string): boolean => {
+  return (email || '').trim().toLowerCase() === PROFESSOR_AUTHORIZED_EMAIL.toLowerCase();
+};
+
 export const defaultAvailableGroups = [
+  'Professor',
   'Grupo 01',
   'Grupo 02',
   'Grupo 03',
@@ -300,6 +319,77 @@ export const loadDataForGroup = (groupName: string, userEmail: string = '') => {
         meetings: initialMeetings,
         reportConfig: initialReportConfig,
         settings: initialSettings,
+      };
+    }
+
+    // If it's the Professor group
+    if (isProfessorGroup(groupName)) {
+      const professorProjects: Project[] = [
+        {
+          id: `proj-prof-${Date.now()}`,
+          name: 'Supervisão Docente & Projetos de Consultoria',
+          clientId: 'cli-prof-1',
+          clientName: 'FAATESP - Coordenação Acadêmica de Consultoria',
+          segment: 'Educação Executiva & Consultoria',
+          description: 'Ambiente central de mentoria e supervisão dos projetos de consultoria estratégica dos Grupos 01 a 05.',
+          mainObjective: 'Acompanhar, avaliar e mentorar os diagnósticos, matrizes SWOT, BSC, 5W2H e entregáveis dos grupos.',
+          leadConsultant: 'Prof. Rogério Augusto',
+          team: ['Prof. Rogério Augusto', 'Equipe Docente FAATESP'],
+          startDate: new Date().toISOString().split('T')[0],
+          expectedEndDate: new Date(Date.now() + 120 * 86400000).toISOString().split('T')[0],
+          status: 'Em andamento',
+          priority: 'Alta',
+          budget: 0,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      ];
+
+      const professorClients: Client[] = [
+        {
+          id: 'cli-prof-1',
+          name: 'FAATESP - Coordenação de Consultoria',
+          contactPerson: 'Prof. Rogério Augusto',
+          role: 'Coordenador / Professor Orientador',
+          phone: '',
+          email: PROFESSOR_AUTHORIZED_EMAIL,
+          city: 'São Paulo',
+          country: 'Brasil',
+          segment: 'Educação Executiva',
+          relationshipOrigin: 'Supervisão Docente',
+          relationshipStatus: 'Ativo',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      ];
+
+      return {
+        projects: professorProjects,
+        clients: professorClients,
+        swotItems: [],
+        ganttTasks: [],
+        ishikawaAnalyses: [],
+        actions5W2H: [],
+        risks: [],
+        paretoItems: [],
+        pestelItems: [],
+        stakeholders: [],
+        canvasModels: [],
+        okrs: [],
+        climateSurveys: [],
+        bscObjectives: initialBscObjectives,
+        contracts: initialContracts,
+        meetings: initialMeetings,
+        reportConfig: {
+          ...initialReportConfig,
+          consultantName: 'Prof. Rogério Augusto',
+          title: 'Relatório Consolidado de Supervisão de Projetos',
+        },
+        settings: {
+          ...initialSettings,
+          consultancyName: 'Supervisão Docente FAATESP',
+          consultantDefaultName: 'Prof. Rogério Augusto',
+        },
       };
     }
 
@@ -388,7 +478,14 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [availableGroups, setAvailableGroups] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem(GROUPS_STORAGE_KEY);
-      return saved ? JSON.parse(saved) : defaultAvailableGroups;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          // Merge to ensure defaultAvailableGroups (including 'Professor') are present
+          return Array.from(new Set([...defaultAvailableGroups, ...parsed]));
+        }
+      }
+      return defaultAvailableGroups;
     } catch {
       return defaultAvailableGroups;
     }
@@ -501,6 +598,15 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       return;
     }
 
+    // Security Restriction: Only faatesp.professor.rogerioaugusto@gmail.com can access the Professor group/role
+    if (isProfessorGroup(cleanGroup) && !isProfessorEmail(cleanEmail)) {
+      showToast(
+        'Acesso Restrito: Apenas o e-mail oficial do professor (faatesp.professor.rogerioaugusto@gmail.com) tem permissão para acessar o grupo Professor.',
+        'error'
+      );
+      return;
+    }
+
     setAvailableGroups((prev) => {
       if (!prev.includes(cleanGroup)) {
         const updated = [...prev, cleanGroup];
@@ -568,7 +674,18 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const switchGroup = (newGroup: string) => {
     if (!currentUser) return;
-    login(currentUser.email, newGroup);
+    const cleanNewGroup = newGroup.trim();
+
+    // Security Restriction on switching groups
+    if (isProfessorGroup(cleanNewGroup) && !isProfessorEmail(currentUser.email)) {
+      showToast(
+        'Acesso Restrito: Apenas o e-mail oficial do professor (faatesp.professor.rogerioaugusto@gmail.com) tem permissão para acessar o grupo Professor.',
+        'error'
+      );
+      return;
+    }
+
+    login(currentUser.email, cleanNewGroup);
   };
 
   const createGroup = (groupName: string) => {
