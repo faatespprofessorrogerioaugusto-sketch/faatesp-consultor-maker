@@ -1928,6 +1928,69 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     showToast('Plano de ação 5W2H gerado com sucesso a partir do Clima!', 'success');
   };
 
+  // Balanced Scorecard (BSC) CRUD
+  const addBscObjective = (obj: Omit<BSCObjective, 'id' | 'projectId'>) => {
+    const newObj: BSCObjective = {
+      ...obj,
+      id: `bsc-${Date.now()}`,
+      projectId: currentProjectId,
+    };
+    setBscObjectives((prev) => [...prev, newObj]);
+    showToast('Objetivo BSC adicionado com sucesso!');
+  };
+
+  const updateBscObjective = (id: string, updates: Partial<BSCObjective>) => {
+    setBscObjectives((prev) => prev.map((o) => (o.id === id ? { ...o, ...updates } : o)));
+    showToast('Objetivo BSC atualizado.');
+  };
+
+  const deleteBscObjective = (id: string) => {
+    setBscObjectives((prev) => prev.filter((o) => o.id !== id));
+    showToast('Objetivo BSC removido.');
+  };
+
+  // Contratos de Prestação de Serviço CRUD
+  const addContract = (contract: Omit<ConsultingContract, 'id' | 'projectId'>) => {
+    const newContract: ConsultingContract = {
+      ...contract,
+      id: `contract-${Date.now()}`,
+      projectId: currentProjectId,
+    };
+    setContracts((prev) => [newContract, ...prev]);
+    showToast('Contrato de Prestação de Serviço cadastrado com sucesso!');
+  };
+
+  const updateContract = (id: string, updates: Partial<ConsultingContract>) => {
+    setContracts((prev) => prev.map((c) => (c.id === id ? { ...c, ...updates } : c)));
+    showToast('Contrato de Prestação de Serviço atualizado com sucesso.');
+  };
+
+  const deleteContract = (id: string) => {
+    setContracts((prev) => prev.filter((c) => c.id !== id));
+    showToast('Contrato removido.');
+  };
+
+  // Simulador de Reunião CRUD
+  const addMeeting = (meeting: Omit<MeetingSimulation, 'id' | 'projectId'>) => {
+    const newMeeting: MeetingSimulation = {
+      ...meeting,
+      id: `meeting-${Date.now()}`,
+      projectId: currentProjectId,
+    };
+    setMeetings((prev) => [newMeeting, ...prev]);
+    showToast('Simulação de Reunião registrada com sucesso!');
+  };
+
+  const updateMeeting = (id: string, updates: Partial<MeetingSimulation>) => {
+    setMeetings((prev) => prev.map((m) => (m.id === id ? { ...m, ...updates } : m)));
+    showToast('Simulação de Reunião atualizada.');
+  };
+
+  const deleteMeeting = (id: string) => {
+    setMeetings((prev) => prev.filter((m) => m.id !== id));
+    showToast('Simulação de Reunião excluída.');
+  };
+
   // Settings
   const updateSettings = (newSettings: Partial<AppSettings>) => {
     setSettings((prev) => ({ ...prev, ...newSettings }));
@@ -2122,6 +2185,21 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         addClimateFeedbackComment,
         deleteClimateFeedbackComment,
         convertClimateCommentTo5W2H,
+
+        bscObjectives,
+        addBscObjective,
+        updateBscObjective,
+        deleteBscObjective,
+
+        contracts,
+        addContract,
+        updateContract,
+        deleteContract,
+
+        meetings,
+        addMeeting,
+        updateMeeting,
+        deleteMeeting,
 
         reportConfig,
         setReportConfig,

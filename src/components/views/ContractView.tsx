@@ -18,6 +18,16 @@ import {
   Download,
 } from 'lucide-react';
 
+// Format date to Brazilian standard (dd/mm/aaaa)
+const formatDateBR = (dateStr?: string): string => {
+  if (!dateStr) return '';
+  const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (match) {
+    return `${match[3]}/${match[2]}/${match[1]}`;
+  }
+  return dateStr;
+};
+
 export const ContractView: React.FC = () => {
   const { currentProjectId, contracts = [], addContract, updateContract, deleteContract, currentProject, clients, settings } = useConsulting();
 
@@ -64,7 +74,7 @@ export const ContractView: React.FC = () => {
   const handleCreateNewContract = () => {
     const client = clients.find((c) => c.name === currentProject?.clientName);
     const newContractData: Omit<ConsultingContract, 'id' | 'projectId'> = {
-      title: `Contrato de Consultoria - ${currentProject?.name || 'Projeto'}`,
+      title: `Contrato de Prestação de Serviço - ${currentProject?.name || 'Projeto'}`,
       contractNumber: `CM-${new Date().getFullYear()}/${String(Math.floor(Math.random() * 900) + 100)}`,
       contractorFirm: settings.consultingFirmName || 'Consultor Maker Assessoria Empresarial',
       contractorCnpj: '48.912.430/0001-92',
@@ -529,7 +539,7 @@ export const ContractView: React.FC = () => {
                   CLÁUSULA TERCEIRA – DO PRAZO E VIGÊNCIA
                 </h4>
                 <p className="text-xs text-slate-700 mt-1 leading-relaxed">
-                  3.1. O prazo estimado para a execução dos trabalhos é de <strong>{selectedContract.durationMonths} (meses)</strong>, com início em <strong>{selectedContract.startDate}</strong>, podendo ser prorrogado mediante termo aditivo acordado entre as partes.
+                  3.1. O prazo estimado para a execução dos trabalhos é de <strong>{selectedContract.durationMonths} (meses)</strong>, com início em <strong>{formatDateBR(selectedContract.startDate)}</strong>, podendo ser prorrogado mediante termo aditivo acordado entre as partes.
                 </p>
               </div>
 

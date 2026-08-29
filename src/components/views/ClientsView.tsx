@@ -20,6 +20,16 @@ import {
   Building,
 } from 'lucide-react';
 
+// Format date to Brazilian standard (dd/mm/aaaa)
+const formatDateBR = (dateStr?: string): string => {
+  if (!dateStr) return '';
+  const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (match) {
+    return `${match[3]}/${match[2]}/${match[1]}`;
+  }
+  return dateStr;
+};
+
 export const ClientsView: React.FC = () => {
   const { clients, projects, addClient, updateClient, deleteClient, setCurrentProjectId, setActiveModule } =
     useConsulting();
@@ -304,7 +314,7 @@ export const ClientsView: React.FC = () => {
                           <div className="min-w-0">
                             <p className="text-xs font-bold text-slate-100 truncate">{proj.name}</p>
                             <p className="text-[11px] text-slate-400">
-                              Líder: {proj.leadConsultant} • {proj.startDate} a {proj.expectedEndDate}
+                              Líder: {proj.leadConsultant} • {formatDateBR(proj.startDate)} a {proj.expectedEndDate ? formatDateBR(proj.expectedEndDate) : 'Em aberto'}
                             </p>
                           </div>
                           <div className="flex items-center gap-2 shrink-0">

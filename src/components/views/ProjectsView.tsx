@@ -32,6 +32,16 @@ import {
   Eye,
 } from 'lucide-react';
 
+// Format date to Brazilian standard (dd/mm/aaaa)
+const formatDateBR = (dateStr?: string): string => {
+  if (!dateStr) return '';
+  const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (match) {
+    return `${match[3]}/${match[2]}/${match[1]}`;
+  }
+  return dateStr;
+};
+
 interface ProjectWithGroup extends Project {
   sourceGroup: string;
 }
@@ -507,21 +517,19 @@ export const ProjectsView: React.FC = () => {
                         Período:
                       </span>
                       <span className="font-medium text-slate-200">
-                        {project.startDate} a {project.expectedEndDate || 'Em aberto'}
+                        {formatDateBR(project.startDate)} a {project.expectedEndDate ? formatDateBR(project.expectedEndDate) : 'Em aberto'}
                       </span>
                     </div>
 
-                    {project.team && project.team.length > 0 && (
-                      <div className="flex items-center justify-between">
-                        <span className="flex items-center gap-1">
-                          <Users className="w-3.5 h-3.5 text-slate-500" />
-                          Equipe:
-                        </span>
-                        <span className="font-medium text-slate-200 truncate max-w-[150px]">
-                          {project.team.join(', ')}
-                        </span>
-                      </div>
-                    )}
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-1">
+                        <Users className="w-3.5 h-3.5 text-slate-500" />
+                        Equipe:
+                      </span>
+                      <span className="font-medium text-slate-200 truncate max-w-[160px]">
+                        {project.sourceGroup || currentGroup}
+                      </span>
+                    </div>
                   </div>
                 </div>
 

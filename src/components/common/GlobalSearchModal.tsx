@@ -134,7 +134,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
       }
     });
 
-    // Pesquisa de Clima & eNPS
+    // Pesquisa de Clima
     currentProjectClimateSurveys.forEach((clim) => {
       if (
         clim.title.toLowerCase().includes(q) ||
@@ -146,7 +146,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
           title: clim.title,
           subtitle: `Pesquisa de Clima (${clim.cycle}) • eNPS: ${clim.enpsScore > 0 ? `+${clim.enpsScore}` : clim.enpsScore} • Favorabilidade: ${clim.overallFavorabilityPercent}%`,
           module: 'climate',
-          moduleName: 'Pesquisa de Clima & eNPS',
+          moduleName: 'Pesquisa de Clima',
           icon: <HeartHandshake className="w-4 h-4 text-rose-500" />,
         });
       }

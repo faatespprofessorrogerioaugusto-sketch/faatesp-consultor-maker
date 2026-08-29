@@ -74,22 +74,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
       icon: <Users2 className="w-5 h-5" />,
     },
     {
-      id: 'bsc',
-      label: 'Balanced Scorecard',
-      number: 4,
-      icon: <Compass className="w-5 h-5" />,
-    },
-    {
       id: 'contract',
-      label: 'Contrato de Consultoria',
-      number: 5,
+      label: 'Contrato de Prestação de Serviço',
+      number: 4,
       icon: <FileSignature className="w-5 h-5" />,
     },
     {
       id: 'meeting',
       label: 'Simulador de Reunião',
-      number: 6,
+      number: 5,
       icon: <Presentation className="w-5 h-5" />,
+    },
+    {
+      id: 'bsc',
+      label: 'Balanced Scorecard',
+      number: 6,
+      icon: <Compass className="w-5 h-5" />,
     },
     {
       id: 'swot',
@@ -129,7 +129,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     {
       id: 'climate',
-      label: 'Pesquisa de clima & eNPS',
+      label: 'Pesquisa de Clima',
       number: 12,
       icon: <HeartHandshake className="w-5 h-5" />,
       badgeCount: currentProjectClimateSurveys.length,
