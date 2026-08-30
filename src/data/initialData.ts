@@ -90,25 +90,6 @@ export const initialProjects: Project[] = [
     createdAt: '2026-01-25T10:00:00Z',
     updatedAt: '2026-02-26T18:00:00Z',
   },
-  {
-    id: 'proj-2',
-    name: 'Reestruturação de Processos e Eficiência Operacional',
-    clientId: 'client-2',
-    clientName: 'LogTech Logística Integrada',
-    segment: 'Transporte & Logística',
-    description: 'Diagnóstico de custos operacionais de última milha, eliminação de gargalos nos centros de distribuição e implantação de metodologia Lean Six Sigma.',
-    mainObjective: 'Otimizar o custo por entrega em 18% e diminuir índice de reentregas para menos de 2.5%.',
-    leadConsultant: 'Camila Mendonça',
-    team: ['Camila Mendonça', 'Lucas Ferreira'],
-    startDate: '2026-01-10',
-    expectedEndDate: '2026-05-30',
-    status: 'Em andamento',
-    priority: 'Alta',
-    budget: 195000,
-    notes: 'Mapeamento de cadeia de valor finalizado. Iniciando plano 5W2H e matriz de riscos de implementação.',
-    createdAt: '2026-01-05T08:00:00Z',
-    updatedAt: '2026-02-20T12:00:00Z',
-  },
 ];
 
 export const initialSwotItems: SwotItem[] = [
@@ -1343,7 +1324,7 @@ export const initialClimateSurveys: ClimateSurvey[] = [
   },
   {
     id: 'climate-2',
-    projectId: 'proj-2',
+    projectId: 'proj-1',
     title: 'Diagnóstico de Engajamento e Clima das Equipes de CD & Frotas',
     cycle: 'Q1 2026',
     status: 'Em andamento',
