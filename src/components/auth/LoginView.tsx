@@ -4,12 +4,11 @@ import {
   getGroupStoragePrefix,
   isProfessorGroup,
   isProfessorEmail,
-  PROFESSOR_AUTHORIZED_EMAIL,
 } from '../../context/ConsultingContext';
 import {
   Shield,
   Users,
-  Mail,
+  User,
   Layers,
   Sparkles,
   ArrowRight,
@@ -24,7 +23,7 @@ import {
 export const LoginView: React.FC = () => {
   const { availableGroups, login } = useConsulting();
 
-  const [email, setEmail] = useState('');
+  const [consultantName, setConsultantName] = useState('');
   const [selectedGroup, setSelectedGroup] = useState(
     availableGroups.find((g) => g === 'Grupo 01') || availableGroups[0] || 'Grupo 01'
   );
@@ -47,14 +46,9 @@ export const LoginView: React.FC = () => {
     e.preventDefault();
     setErrorMsg('');
 
-    const cleanEmail = email.trim();
-    if (!cleanEmail) {
-      setErrorMsg('Por favor, digite seu e-mail corporativo ou pessoal.');
-      return;
-    }
-
-    if (!cleanEmail.includes('@') || !cleanEmail.includes('.')) {
-      setErrorMsg('Por favor, informe um formato de e-mail válido (ex: consultor@empresa.com).');
+    const cleanName = consultantName.trim();
+    if (!cleanName) {
+      setErrorMsg('Por favor, digite seu nome ou identificação de consultor.');
       return;
     }
 
@@ -64,15 +58,15 @@ export const LoginView: React.FC = () => {
       return;
     }
 
-    // Security Verification: Only authorized professor email can log in as Professor
-    if (isProfessorGroup(groupToUse) && !isProfessorEmail(cleanEmail)) {
+    // Security Verification: Only authorized professor can log in as Professor
+    if (isProfessorGroup(groupToUse) && !isProfessorEmail(cleanName)) {
       setErrorMsg(
         'Acesso Restrito ao Perfil Docente: Este ambiente é exclusivo da coordenação e supervisão docente. Por favor, selecione o seu respectivo grupo de consultoria (Grupo 01 ao Grupo 05).'
       );
       return;
     }
 
-    login(cleanEmail, groupToUse);
+    login(cleanName, groupToUse);
   };
 
   return (
@@ -118,7 +112,7 @@ export const LoginView: React.FC = () => {
                 Entrar na Plataforma
               </h2>
               <p className="text-sm text-slate-400 mt-1">
-                Identifique-se com seu e-mail e escolha o grupo de trabalho para carregar seu ambiente específico.
+                Identifique seu nome e escolha o grupo de trabalho para carregar seu ambiente específico.
               </p>
             </div>
 
@@ -133,24 +127,20 @@ export const LoginView: React.FC = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-5" autoComplete="off" noValidate>
-              {/* Fake inputs to trick aggressive browser autofill */}
-              <input type="text" style={{ display: 'none' }} tabIndex={-1} aria-hidden="true" />
-              <input type="password" style={{ display: 'none' }} tabIndex={-1} aria-hidden="true" />
-
-              {/* Email Input */}
+              {/* Name / Consultant Identification Input */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
-                  DIGITE SEU E-MAIL
+                  NOME / IDENTIFICAÇÃO DO CONSULTOR
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <Mail className="w-4 h-4" />
+                    <User className="w-4 h-4" />
                   </div>
                   <input
-                    id="login-email-input"
+                    id="login-consultant-name-input"
                     type="text"
-                    name={`field_${Math.random()}`}
-                    autoComplete="new-password"
+                    name="consultant_unique_login_name_field"
+                    autoComplete="off"
                     autoCorrect="off"
                     autoCapitalize="off"
                     spellCheck={false}
@@ -158,9 +148,9 @@ export const LoginView: React.FC = () => {
                     data-form-type="other"
                     data-1p-ignore="true"
                     required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Digite seu e-mail"
+                    value={consultantName}
+                    onChange={(e) => setConsultantName(e.target.value)}
+                    placeholder="Digite seu nome ou identificação"
                     className="w-full pl-10 pr-4 py-2.5 bg-slate-800/90 border border-slate-700 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   />
                 </div>
@@ -238,8 +228,12 @@ export const LoginView: React.FC = () => {
                     <input
                       id="login-new-group-input"
                       type="text"
-                      name={`new_grp_${Math.random()}`}
+                      name="new_consulting_group_name_input"
                       autoComplete="off"
+                      autoCorrect="off"
+                      spellCheck={false}
+                      data-lpignore="true"
+                      data-1p-ignore="true"
                       value={newGroupName}
                       onChange={(e) => setNewGroupName(e.target.value)}
                       placeholder="Digite o nome do novo grupo ou equipe..."

@@ -431,7 +431,14 @@ export const ClientsView: React.FC = () => {
                     E-mail
                   </label>
                   <input
-                    type="email"
+                    type="text"
+                    name="client_contact_email_unique"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="contato@empresa.com"

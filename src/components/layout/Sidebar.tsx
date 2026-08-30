@@ -48,33 +48,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
     settings,
   } = useConsulting();
 
-  interface NavGroup {
-    title: string;
-    items: Array<{
-      id: ModuleId;
-      label: string;
-      icon: React.ReactNode;
-      badgeCount?: number;
-      badgeColor?: string;
-    }>;
+  interface NavItem {
+    id: ModuleId;
+    label: string;
+    icon: React.ReactNode;
+    badgeCount?: number;
+    badgeColor?: string;
   }
 
+  interface NavGroup {
+    title: string;
+    items: NavItem[];
+  }
+
+  const topStandaloneItem: NavItem = {
+    id: 'dashboard',
+    label: 'Dashboard',
+    icon: <LayoutDashboard className="w-4 h-4" />,
+  };
+
   const navGroups: NavGroup[] = [
-    {
-      title: 'Gestão & Projetos',
-      items: [
-        {
-          id: 'dashboard',
-          label: 'Dashboard',
-          icon: <LayoutDashboard className="w-4 h-4" />,
-        },
-        {
-          id: 'projects',
-          label: 'Projetos de consultoria',
-          icon: <FolderKanban className="w-4 h-4" />,
-        },
-      ],
-    },
     {
       title: 'CLIENTES',
       items: [
@@ -82,6 +75,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           id: 'clients',
           label: 'Cadastro de Clientes',
           icon: <Users2 className="w-4 h-4" />,
+        },
+        {
+          id: 'projects',
+          label: 'Projetos de consultoria',
+          icon: <FolderKanban className="w-4 h-4" />,
         },
         {
           id: 'contract',
@@ -147,7 +145,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       items: [
         {
           id: 'climate',
-          label: 'Pesquisa de Clima',
+          label: 'Pesquisa de Clima Organizacional',
           icon: <HeartHandshake className="w-4 h-4" />,
           badgeCount: currentProjectClimateSurveys.length,
         },
@@ -242,6 +240,40 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Scrollable Navigation Groups */}
         <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-4">
+          {/* Standalone Top Item: Dashboard */}
+          <div className="space-y-1">
+            {(() => {
+              const isActive = activeModule === topStandaloneItem.id;
+              return (
+                <button
+                  key={topStandaloneItem.id}
+                  id={`sidebar-nav-${topStandaloneItem.id}`}
+                  onClick={() => handleSelectModule(topStandaloneItem.id)}
+                  title={isCollapsed ? topStandaloneItem.label : undefined}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all group relative cursor-pointer ${
+                    isActive
+                      ? 'bg-slate-800 text-white font-semibold shadow-sm border border-slate-700/60'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  }`}
+                >
+                  <span
+                    className={`shrink-0 ${
+                      isActive ? 'text-blue-400' : 'text-slate-400 group-hover:text-slate-200'
+                    }`}
+                  >
+                    {topStandaloneItem.icon}
+                  </span>
+
+                  {!isCollapsed && (
+                    <span className="truncate flex-1 text-left font-semibold">{topStandaloneItem.label}</span>
+                  )}
+                </button>
+              );
+            })()}
+          </div>
+
+          <div className="border-t border-slate-800/80 my-2" />
+
           {navGroups.map((group, gIdx) => (
             <div key={group.title} className="space-y-1">
               {!isCollapsed ? (

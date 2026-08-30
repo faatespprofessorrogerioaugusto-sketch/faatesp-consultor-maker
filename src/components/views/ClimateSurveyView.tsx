@@ -366,8 +366,8 @@ export const ClimateSurveyView: React.FC = () => {
   return (
     <div id="climate-survey-view" className="space-y-6">
       <Breadcrumbs
-        title="Pesquisa de Clima Organizacional & eNPS"
-        subtitle={`Diagnóstico de satisfação, engajamento e lealdade da equipe para ${currentProject.name}`}
+        title="Pesquisa de Clima Organizacional"
+        subtitle="Pesquisa de Clima Organizacional"
       />
 
       {/* Header & Controls */}
@@ -378,7 +378,7 @@ export const ClimateSurveyView: React.FC = () => {
               <HeartHandshake className="w-5 h-5" />
             </span>
             <h1 className="text-xl font-bold text-white tracking-tight">
-              Pesquisa de Clima & eNPS
+              Pesquisa de Clima Organizacional
             </h1>
             {survey && (
               <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700">
@@ -387,7 +387,7 @@ export const ClimateSurveyView: React.FC = () => {
             )}
           </div>
           <p className="text-xs text-slate-400">
-            Diagnóstico de satisfação, lealdade (eNPS) e dimensões de engajamento humano para {currentProject.name}.
+            Pesquisa de Clima Organizacional
           </p>
         </div>
 

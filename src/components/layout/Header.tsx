@@ -197,7 +197,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileSidebar }) => {
               id="header-active-group-badge-btn"
               onClick={() => setIsGroupMenuOpen(!isGroupMenuOpen)}
               className="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg border border-blue-500/30 bg-blue-950/50 hover:bg-blue-900/60 text-blue-200 transition-all cursor-pointer shadow-sm group"
-              title="Grupo de trabalho ativo (Clique para gerenciar ou alternar)"
+              title="Grupo de trabalho ativo (Clique para alternar)"
             >
               <div className="relative flex items-center justify-center">
                 <Users className="w-3.5 h-3.5 text-blue-400 group-hover:scale-110 transition-transform" />
