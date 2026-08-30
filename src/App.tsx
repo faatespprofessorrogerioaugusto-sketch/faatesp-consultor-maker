@@ -10,7 +10,7 @@ import { LoginView } from './components/auth/LoginView';
 import { DashboardView } from './components/views/DashboardView';
 import { ProjectsView } from './components/views/ProjectsView';
 import { ClientsView } from './components/views/ClientsView';
-import { BSCView } from './components/views/BSCView';
+import { OkrsView } from './components/views/OkrsView';
 import { ContractView } from './components/views/ContractView';
 import { MeetingSimulatorView } from './components/views/MeetingSimulatorView';
 import { SwotView } from './components/views/SwotView';
@@ -44,8 +44,9 @@ const MainContent: React.FC = () => {
         return <ProjectsView />;
       case 'clients':
         return <ClientsView />;
+      case 'okrs':
       case 'bsc':
-        return <BSCView />;
+        return <OkrsView />;
       case 'contract':
         return <ContractView />;
       case 'meeting':

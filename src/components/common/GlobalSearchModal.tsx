@@ -14,6 +14,7 @@ import {
   Briefcase,
   GitBranch,
   HeartHandshake,
+  Target,
 } from 'lucide-react';
 
 interface GlobalSearchModalProps {
@@ -29,6 +30,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
     currentProjectRisks,
     currentProjectPareto,
     currentProjectClimateSurveys,
+    currentProjectOkrs,
     currentProject,
     setActiveModule,
   } = useConsulting();
@@ -152,6 +154,43 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
       }
     });
 
+    // OKRs & Metas
+    (currentProjectOkrs || []).forEach((okr) => {
+      if (
+        okr.title.toLowerCase().includes(q) ||
+        okr.category.toLowerCase().includes(q) ||
+        okr.owner.toLowerCase().includes(q) ||
+        (okr.description && okr.description.toLowerCase().includes(q))
+      ) {
+        results.push({
+          id: okr.id,
+          title: okr.title,
+          subtitle: `OKR (${okr.category}) • Progresso Médio: ${okr.overallProgress || 0}% • Líder: ${okr.owner}`,
+          module: 'okrs',
+          moduleName: 'OKRs e Metas',
+          icon: <Target className="w-4 h-4 text-blue-500" />,
+        });
+      }
+
+      // Index Key Results too
+      (okr.keyResults || []).forEach((kr) => {
+        if (
+          kr.title.toLowerCase().includes(q) ||
+          kr.owner.toLowerCase().includes(q) ||
+          (kr.indicator && kr.indicator.toLowerCase().includes(q))
+        ) {
+          results.push({
+            id: kr.id,
+            title: kr.title,
+            subtitle: `Key Result (KR) • Meta: ${kr.targetValue} ${kr.unit} • Realizado: ${kr.currentValue} (${kr.progressPercent}%)`,
+            module: 'okrs',
+            moduleName: 'OKRs e Metas',
+            icon: <Target className="w-4 h-4 text-emerald-500" />,
+          });
+        }
+      });
+    });
+
     return results;
   }, [
     query,
@@ -161,6 +200,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
     currentProjectRisks,
     currentProjectPareto,
     currentProjectClimateSurveys,
+    currentProjectOkrs,
   ]);
 
   if (!isOpen) return null;

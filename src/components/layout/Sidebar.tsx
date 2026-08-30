@@ -17,7 +17,7 @@ import {
   Briefcase,
   Layers,
   HeartHandshake,
-  Compass,
+  Target,
   FileSignature,
   Presentation,
 } from 'lucide-react';
@@ -44,107 +44,129 @@ export const Sidebar: React.FC<SidebarProps> = ({
     currentProjectActions,
     currentProjectRisks,
     currentProjectClimateSurveys,
+    currentProjectOkrs,
     settings,
   } = useConsulting();
 
-  const menuItems: Array<{
-    id: ModuleId;
-    label: string;
-    number: number;
-    icon: React.ReactNode;
-    badgeCount?: number;
-    badgeColor?: string;
-  }> = [
+  interface NavGroup {
+    title: string;
+    items: Array<{
+      id: ModuleId;
+      label: string;
+      icon: React.ReactNode;
+      badgeCount?: number;
+      badgeColor?: string;
+    }>;
+  }
+
+  const navGroups: NavGroup[] = [
     {
-      id: 'dashboard',
-      label: 'Dashboard',
-      number: 1,
-      icon: <LayoutDashboard className="w-5 h-5" />,
+      title: 'Gestão & Projetos',
+      items: [
+        {
+          id: 'dashboard',
+          label: 'Dashboard',
+          icon: <LayoutDashboard className="w-4 h-4" />,
+        },
+        {
+          id: 'projects',
+          label: 'Projetos de consultoria',
+          icon: <FolderKanban className="w-4 h-4" />,
+        },
+      ],
     },
     {
-      id: 'projects',
-      label: 'Projetos de consultoria',
-      number: 2,
-      icon: <FolderKanban className="w-5 h-5" />,
+      title: 'CLIENTES',
+      items: [
+        {
+          id: 'clients',
+          label: 'Cadastro de Clientes',
+          icon: <Users2 className="w-4 h-4" />,
+        },
+        {
+          id: 'contract',
+          label: 'Contrato de Prestação de Serviços',
+          icon: <FileSignature className="w-4 h-4" />,
+        },
+        {
+          id: 'meeting',
+          label: 'Simulador de Reunião',
+          icon: <Presentation className="w-4 h-4" />,
+        },
+      ],
     },
     {
-      id: 'clients',
-      label: 'Clientes e contatos',
-      number: 3,
-      icon: <Users2 className="w-5 h-5" />,
+      title: 'FERRAMENTAS DE DIAGNÓSTICOS',
+      items: [
+        {
+          id: 'swot',
+          label: 'Análise SWOT',
+          icon: <Grid2X2 className="w-4 h-4" />,
+          badgeCount: currentProjectSwot.length,
+        },
+        {
+          id: 'pareto',
+          label: 'Diagrama de Pareto',
+          icon: <BarChart3 className="w-4 h-4" />,
+        },
+        {
+          id: 'risks',
+          label: 'Matriz de Riscos',
+          icon: <ShieldAlert className="w-4 h-4" />,
+          badgeCount: currentProjectRisks.filter((r) => r.classification === 'Crítico' || r.classification === 'Alto').length,
+          badgeColor: 'bg-rose-500 text-white',
+        },
+      ],
     },
     {
-      id: 'contract',
-      label: 'Contrato de Prestação de Serviço',
-      number: 4,
-      icon: <FileSignature className="w-5 h-5" />,
+      title: 'FERRAMENTAS DE PLANEJAMENTO',
+      items: [
+        {
+          id: 'gantt',
+          label: 'Diagrama de Gantt',
+          icon: <CalendarRange className="w-4 h-4" />,
+          badgeCount: currentProjectTasks.length,
+        },
+        {
+          id: 'okrs',
+          label: 'OKR',
+          icon: <Target className="w-4 h-4" />,
+          badgeCount: currentProjectOkrs.length,
+        },
+        {
+          id: '5w2h',
+          label: 'Plano de Ação (5W2H)',
+          icon: <CheckSquare2 className="w-4 h-4" />,
+          badgeCount: currentProjectActions.filter((a) => a.status !== 'Concluída').length,
+          badgeColor: 'bg-amber-500 text-white',
+        },
+      ],
     },
     {
-      id: 'meeting',
-      label: 'Simulador de Reunião',
-      number: 5,
-      icon: <Presentation className="w-5 h-5" />,
+      title: 'CULTURA ORGANIZACIONAL',
+      items: [
+        {
+          id: 'climate',
+          label: 'Pesquisa de Clima',
+          icon: <HeartHandshake className="w-4 h-4" />,
+          badgeCount: currentProjectClimateSurveys.length,
+        },
+      ],
     },
     {
-      id: 'bsc',
-      label: 'Balanced Scorecard',
-      number: 6,
-      icon: <Compass className="w-5 h-5" />,
-    },
-    {
-      id: 'swot',
-      label: 'Análise SWOT',
-      number: 7,
-      icon: <Grid2X2 className="w-5 h-5" />,
-      badgeCount: currentProjectSwot.length,
-    },
-    {
-      id: 'gantt',
-      label: 'Diagrama de Gantt',
-      number: 8,
-      icon: <CalendarRange className="w-5 h-5" />,
-      badgeCount: currentProjectTasks.length,
-    },
-    {
-      id: '5w2h',
-      label: 'Plano de ação 5W2H',
-      number: 9,
-      icon: <CheckSquare2 className="w-5 h-5" />,
-      badgeCount: currentProjectActions.filter((a) => a.status !== 'Concluída').length,
-      badgeColor: 'bg-amber-500 text-white',
-    },
-    {
-      id: 'risks',
-      label: 'Matriz de riscos',
-      number: 10,
-      icon: <ShieldAlert className="w-5 h-5" />,
-      badgeCount: currentProjectRisks.filter((r) => r.classification === 'Crítico' || r.classification === 'Alto').length,
-      badgeColor: 'bg-rose-500 text-white',
-    },
-    {
-      id: 'pareto',
-      label: 'Análise de Pareto',
-      number: 11,
-      icon: <BarChart3 className="w-5 h-5" />,
-    },
-    {
-      id: 'climate',
-      label: 'Pesquisa de Clima',
-      number: 12,
-      icon: <HeartHandshake className="w-5 h-5" />,
-      badgeCount: currentProjectClimateSurveys.length,
-    },
-    {
-      id: 'reports',
-      label: 'Relatórios',
-      number: 13,
-      icon: <FileSpreadsheet className="w-5 h-5" />,
-    },
-    {
-      id: 'settings',
-      label: 'Configurações',
-      number: 14,
-      icon: <Settings className="w-5 h-5" />,
+      title: 'Consolidação & Ajustes',
+      items: [
+        {
+          id: 'reports',
+          label: 'Relatórios Executivos',
+          icon: <FileSpreadsheet className="w-4 h-4" />,
+        },
+        {
+          id: 'settings',
+          label: 'Configurações',
+          icon: <Settings className="w-4 h-4" />,
+        },
+      ],
     },
   ];
 
@@ -218,53 +240,67 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         )}
 
-        {/* Scrollable Navigation Items */}
-        <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
-          {menuItems.map((item) => {
-            const isActive = activeModule === item.id;
-            return (
-              <button
-                key={item.id}
-                id={`sidebar-nav-${item.id}`}
-                onClick={() => handleSelectModule(item.id)}
-                title={isCollapsed ? `${item.number}. ${item.label}` : undefined}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all group relative cursor-pointer ${
-                  isActive
-                    ? 'bg-slate-800 text-white font-semibold shadow-sm border border-slate-700/60'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                }`}
-              >
-                <span
-                  className={`shrink-0 ${
-                    isActive ? 'text-blue-400' : 'text-slate-400 group-hover:text-slate-200'
-                  }`}
-                >
-                  {item.icon}
-                </span>
+        {/* Scrollable Navigation Groups */}
+        <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-4">
+          {navGroups.map((group, gIdx) => (
+            <div key={group.title} className="space-y-1">
+              {!isCollapsed ? (
+                <div className="px-3 pt-1 pb-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    {group.title}
+                  </span>
+                </div>
+              ) : (
+                gIdx > 0 && <div className="my-2 border-t border-slate-800/80" />
+              )}
 
-                {!isCollapsed && (
-                  <>
-                    <span className="truncate flex-1 text-left">{item.label}</span>
-                    {item.badgeCount !== undefined && item.badgeCount > 0 && (
-                      <span
-                        className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                          isActive
-                            ? 'bg-blue-600/40 text-blue-300 border border-blue-500/40'
-                            : item.badgeColor || 'bg-slate-800 text-slate-300 border border-slate-700'
-                        }`}
-                      >
-                        {item.badgeCount}
-                      </span>
+              {group.items.map((item) => {
+                const isActive = activeModule === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    id={`sidebar-nav-${item.id}`}
+                    onClick={() => handleSelectModule(item.id)}
+                    title={isCollapsed ? item.label : undefined}
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all group relative cursor-pointer ${
+                      isActive
+                        ? 'bg-slate-800 text-white font-semibold shadow-sm border border-slate-700/60'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    }`}
+                  >
+                    <span
+                      className={`shrink-0 ${
+                        isActive ? 'text-blue-400' : 'text-slate-400 group-hover:text-slate-200'
+                      }`}
+                    >
+                      {item.icon}
+                    </span>
+
+                    {!isCollapsed && (
+                      <>
+                        <span className="truncate flex-1 text-left">{item.label}</span>
+                        {item.badgeCount !== undefined && item.badgeCount > 0 && (
+                          <span
+                            className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full ${
+                              isActive
+                                ? 'bg-blue-600/40 text-blue-300 border border-blue-500/40'
+                                : item.badgeColor || 'bg-slate-800 text-slate-300 border border-slate-700'
+                            }`}
+                          >
+                            {item.badgeCount}
+                          </span>
+                        )}
+                      </>
                     )}
-                  </>
-                )}
 
-                {isCollapsed && item.badgeCount !== undefined && item.badgeCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-blue-500" />
-                )}
-              </button>
-            );
-          })}
+                    {isCollapsed && item.badgeCount !== undefined && item.badgeCount > 0 && (
+                      <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-blue-500" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
         </nav>
 
         {/* Footer info */}

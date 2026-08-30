@@ -18,7 +18,7 @@ import {
   Users2,
   FileSignature,
   Presentation,
-  Compass,
+  Target,
   Grid2X2,
   GitPullRequest,
   HeartHandshake,
@@ -43,6 +43,7 @@ export const ReportsView: React.FC = () => {
     currentProjectRisks,
     currentProjectPareto,
     currentProjectClimateSurveys,
+    currentProjectOkrs,
     bscObjectives = [],
     contracts = [],
     meetings = [],
@@ -68,12 +69,10 @@ export const ReportsView: React.FC = () => {
     };
   }, [currentProjectSwot]);
 
-  // Derived BSC objectives for this project
-  const projectBsc = useMemo(() => {
-    return (bscObjectives || []).filter(
-      (b) => !b.projectId || b.projectId === currentProjectId
-    );
-  }, [bscObjectives, currentProjectId]);
+  // Derived OKRs for this project
+  const projectOkrs = useMemo(() => {
+    return currentProjectOkrs || [];
+  }, [currentProjectOkrs]);
 
   // Derived Contract for this project
   const projectContract = useMemo(() => {
@@ -101,7 +100,7 @@ export const ReportsView: React.FC = () => {
     executiveSummary: true,
     contract: true,
     meetings: true,
-    bsc: true,
+    okrs: true,
     swot: true,
     ishikawa: true,
     actions5w2h: true,
@@ -116,7 +115,7 @@ export const ReportsView: React.FC = () => {
   );
 
   const [recommendations, setRecommendations] = useState(
-    `1. Priorizar as ações críticas no plano 5W2H com foco em aumento de produtividade.\n2. Instituir comitê semanal de governança com os líderes e stakeholders-chave.\n3. Acompanhar os indicadores e metas do Balanced Scorecard (BSC) no ciclo trimestral.`
+    `1. Priorizar as ações críticas no plano 5W2H com foco em aumento de produtividade.\n2. Instituir comitê semanal de governança com os líderes e stakeholders-chave.\n3. Acompanhar as metas dos Objetivos e Resultados-Chave (OKRs) nos rituais de check-in quinzenais.`
   );
 
   const [copiedSummary, setCopiedSummary] = useState(false);
@@ -136,7 +135,7 @@ export const ReportsView: React.FC = () => {
       client: currentProjectClient,
       contract: projectContract,
       meetings: projectMeetings,
-      bscObjectives: projectBsc,
+      okrs: projectOkrs,
       swot: swotGrouped,
       gantt: currentProjectTasks,
       ishikawa: projectIshikawas,
@@ -201,11 +200,17 @@ export const ReportsView: React.FC = () => {
       csvContent += `"${r.risk}";"${r.category}";"${r.riskScore}";"${r.classification}";"${r.preventiveAction || ''}"\n`;
     });
 
-    // BSC
-    csvContent += `\n--- BALANCED SCORECARD (BSC) ---\n`;
-    csvContent += `Perspectiva;Objetivo Estrategico;Meta;Indicador;Status\n`;
-    projectBsc.forEach((b) => {
-      csvContent += `"${b.perspective}";"${b.objective}";"${b.target}";"${b.kpi}";"${b.status}"\n`;
+    // OKRs & Metas
+    csvContent += `\n--- OBJETIVOS E METAS (OKRs) ---\n`;
+    csvContent += `Objetivo;Categoria;Ciclo;Responsavel;Key Result;Baseline;Realizado;Meta;Progresso;Status\n`;
+    projectOkrs.forEach((o) => {
+      if (o.keyResults.length === 0) {
+        csvContent += `"${o.title}";"${o.category}";"${o.cycle}";"${o.owner}";"-";"-";"-";"-";"0%";"-"\n`;
+      } else {
+        o.keyResults.forEach((kr) => {
+          csvContent += `"${o.title}";"${o.category}";"${o.cycle}";"${o.owner}";"${kr.title}";"${kr.initialValue} ${kr.unit}";"${kr.currentValue} ${kr.unit}";"${kr.targetValue} ${kr.unit}";"${kr.progressPercent}%";"${kr.status}"\n`;
+        });
+      }
     });
 
     const encodedUri = encodeURI(csvContent);
@@ -239,7 +244,7 @@ ${recommendations}
 *INDICADORES GERAIS:*
 • Ações 5W2H Mapeadas: ${currentProjectActions.length} (${currentProjectActions.filter((a) => a.status === 'Concluída').length} concluídas)
 • Riscos Identificados: ${currentProjectRisks.length} (${currentProjectRisks.filter((r) => r.classification === 'Crítico' || r.classification === 'Alto').length} de alta prioridade)
-• Objetivos BSC: ${projectBsc.length}
+• Objetivos Estratégicos (OKRs): ${projectOkrs.length} (${projectOkrs.reduce((acc, o) => acc + o.keyResults.length, 0)} KRs)
 • Itens SWOT: ${currentProjectSwot.length}
 • Pesquisas de Clima: ${currentProjectClimateSurveys.length}`;
 
@@ -379,7 +384,7 @@ ${recommendations}
               { key: 'executiveSummary', label: 'Sumário Executivo' },
               { key: 'contract', label: 'Contrato de Serviço' },
               { key: 'meetings', label: 'Simulador de Reunião' },
-              { key: 'bsc', label: 'Balanced Scorecard' },
+              { key: 'okrs', label: 'OKRs & Metas' },
               { key: 'swot', label: 'Análise SWOT' },
               { key: 'ishikawa', label: 'Diagrama Ishikawa' },
               { key: 'actions5w2h', label: 'Plano 5W2H' },
@@ -503,8 +508,8 @@ ${recommendations}
                 <strong className="text-sm font-bold text-slate-100 print:text-slate-900">{currentProjectRisks.length}</strong>
               </div>
               <div className="p-2.5 bg-slate-800/60 rounded-lg border border-slate-750 print:bg-slate-50 print:border-slate-200">
-                <span className="text-[10px] text-slate-400 print:text-slate-600 block">Objetivos BSC</span>
-                <strong className="text-sm font-bold text-slate-100 print:text-slate-900">{projectBsc.length}</strong>
+                <span className="text-[10px] text-slate-400 print:text-slate-600 block">OKRs & Metas</span>
+                <strong className="text-sm font-bold text-slate-100 print:text-slate-900">{projectOkrs.length}</strong>
               </div>
               <div className="p-2.5 bg-slate-800/60 rounded-lg border border-slate-750 print:bg-slate-50 print:border-slate-200">
                 <span className="text-[10px] text-slate-400 print:text-slate-600 block">Diagnósticos de Clima</span>
@@ -576,35 +581,72 @@ ${recommendations}
           </div>
         )}
 
-        {/* Section 4: Balanced Scorecard (BSC) */}
-        {includedModules.bsc && projectBsc.length > 0 && (
+        {/* Section 4: Objetivos e Resultados-Chave (OKRs & Metas) */}
+        {(includedModules.okrs || (includedModules as any).bsc) && projectOkrs.length > 0 && (
           <div className="mb-8 space-y-3">
             <h2 className="text-sm font-black text-slate-100 uppercase tracking-wider border-b border-slate-800 pb-1 print:text-slate-900 print:border-slate-300 flex items-center gap-1.5">
-              <Compass className="w-4 h-4 text-blue-400 print:text-slate-800" />
-              4. Balanced Scorecard (BSC) — Metas e Indicadores ({projectBsc.length})
+              <Target className="w-4 h-4 text-blue-400 print:text-slate-800" />
+              4. Objetivos e Resultados-Chave (OKRs & Metas) — Desdobramento Estratégico ({projectOkrs.length})
             </h2>
-            <table className="w-full text-left text-xs border border-slate-800 divide-y divide-slate-800 print:border-slate-200 print:divide-slate-200">
-              <thead className="bg-slate-800 text-[10px] font-bold text-slate-300 uppercase print:bg-slate-100 print:text-slate-700">
-                <tr>
-                  <th className="p-2">Perspectiva</th>
-                  <th className="p-2">Objetivo Estratégico</th>
-                  <th className="p-2">Meta</th>
-                  <th className="p-2">Indicador (KPI)</th>
-                  <th className="p-2">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/70 print:divide-slate-100">
-                {projectBsc.map((b) => (
-                  <tr key={b.id}>
-                    <td className="p-2 font-bold text-slate-300 print:text-slate-800">{b.perspective}</td>
-                    <td className="p-2 text-slate-100 print:text-slate-900 font-semibold">{b.objective}</td>
-                    <td className="p-2 text-slate-300 print:text-slate-700">{b.target}</td>
-                    <td className="p-2 text-slate-400 print:text-slate-600">{b.kpi}</td>
-                    <td className="p-2 font-bold text-blue-400 print:text-blue-700">{b.status}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="space-y-4 text-xs">
+              {projectOkrs.map((obj) => (
+                <div
+                  key={obj.id}
+                  className="p-4 bg-slate-800/60 rounded-lg border border-slate-750 print:bg-slate-50 print:border-slate-200 space-y-3"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-slate-750 pb-2 print:border-slate-200">
+                    <div>
+                      <span className="text-[10px] font-bold text-blue-400 uppercase tracking-wider mr-2 print:text-blue-700">
+                        [{obj.category}]
+                      </span>
+                      <strong className="text-slate-100 print:text-slate-900 text-sm">{obj.title}</strong>
+                    </div>
+                    <div className="text-slate-400 print:text-slate-600 text-[11px] flex items-center gap-2 shrink-0">
+                      <span>Ciclo: <strong>{obj.cycle}</strong></span>
+                      <span>•</span>
+                      <span>Líder: <strong>{obj.owner}</strong></span>
+                    </div>
+                  </div>
+
+                  {obj.keyResults.length > 0 ? (
+                    <table className="w-full text-left text-xs border border-slate-800 divide-y divide-slate-800 print:border-slate-200 print:divide-slate-200 mt-2">
+                      <thead className="bg-slate-800 text-[10px] font-bold text-slate-300 uppercase print:bg-slate-100 print:text-slate-700">
+                        <tr>
+                          <th className="p-2">Resultado-Chave (KR)</th>
+                          <th className="p-2 text-right">Baseline</th>
+                          <th className="p-2 text-right">Realizado</th>
+                          <th className="p-2 text-right">Meta</th>
+                          <th className="p-2 text-center">Progresso</th>
+                          <th className="p-2">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/70 print:divide-slate-100">
+                        {obj.keyResults.map((kr) => (
+                          <tr key={kr.id}>
+                            <td className="p-2 font-medium text-slate-200 print:text-slate-800">{kr.title}</td>
+                            <td className="p-2 text-right font-mono text-slate-400 print:text-slate-600">
+                              {kr.initialValue} {kr.unit}
+                            </td>
+                            <td className="p-2 text-right font-mono font-bold text-slate-100 print:text-slate-900">
+                              {kr.currentValue} {kr.unit}
+                            </td>
+                            <td className="p-2 text-right font-mono text-slate-300 print:text-slate-700 font-semibold">
+                              {kr.targetValue} {kr.unit}
+                            </td>
+                            <td className="p-2 text-center">
+                              <span className="font-bold text-slate-100 print:text-slate-900">{kr.progressPercent}%</span>
+                            </td>
+                            <td className="p-2 font-bold text-blue-400 print:text-blue-700">{kr.status}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <p className="text-slate-400 print:text-slate-500 italic text-[11px]">Nenhum Key Result cadastrado.</p>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

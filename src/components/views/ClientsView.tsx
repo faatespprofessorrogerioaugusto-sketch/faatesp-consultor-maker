@@ -127,7 +127,7 @@ export const ClientsView: React.FC = () => {
   return (
     <div className="space-y-6">
       <Breadcrumbs
-        title="Clientes e Contatos"
+        title="Cadastro de Clientes"
         subtitle="Gerenciamento de contas de clientes, contatos-chave e histórico de projetos"
         actions={
           <button

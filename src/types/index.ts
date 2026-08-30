@@ -3,6 +3,7 @@ export type ModuleId =
   | 'projects'
   | 'clients'
   | 'swot'
+  | 'okrs'
   | 'bsc'
   | 'contract'
   | 'meeting'

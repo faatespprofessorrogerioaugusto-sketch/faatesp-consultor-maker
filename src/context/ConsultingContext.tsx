@@ -155,13 +155,18 @@ interface ConsultingContextType {
   // OKRs
   okrs: OkrObjective[];
   currentProjectOkrs: OkrObjective[];
+  currentProjectOKRs?: OkrObjective[];
   addOkr: (okr: Omit<OkrObjective, 'id' | 'createdAt' | 'updatedAt' | 'overallProgress' | 'projectId'>) => void;
   updateOkr: (id: string, updates: Partial<OkrObjective>) => void;
   duplicateOkr: (id: string) => void;
   deleteOkr: (id: string) => void;
+  addObjective?: (okr: Omit<OkrObjective, 'id' | 'createdAt' | 'updatedAt' | 'overallProgress' | 'projectId'>) => void;
+  updateObjective?: (id: string, updates: Partial<OkrObjective>) => void;
+  deleteObjective?: (id: string) => void;
   addKeyResult: (okrId: string, kr: Omit<KeyResult, 'id' | 'progressPercent'>) => void;
   updateKeyResult: (okrId: string, krId: string, updates: Partial<KeyResult>) => void;
   deleteKeyResult: (okrId: string, krId: string) => void;
+  convertKRTo5W2H: (okrId: string, krId: string, actionWhat: string, responsible: string, deadline: string, cost?: number) => void;
 
   // Pesquisa de Clima Organizacional & eNPS
   climateSurveys: ClimateSurvey[];
@@ -1755,6 +1760,42 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     showToast('Resultado-Chave removido.');
   };
 
+  const convertKRTo5W2H = (
+    okrId: string,
+    krId: string,
+    actionWhat: string,
+    responsible: string,
+    deadline: string,
+    cost: number = 0
+  ) => {
+    const okr = okrs.find((o) => o.id === okrId);
+    const kr = okr?.keyResults.find((k) => k.id === krId);
+    
+    const newAction: Action5W2H = {
+      id: `act-okr-${Date.now()}`,
+      projectId: currentProjectId,
+      what: actionWhat || `Ação para atingimento da meta: ${kr?.title || 'Resultado-Chave'}`,
+      why: `Garantir o atingimento do Objetivo "${okr?.title || 'Estratégico'}" e do indicador ${kr?.indicator || 'KR'} (${kr?.currentValue ?? 0} -> ${kr?.targetValue ?? 0} ${kr?.unit ?? ''})`,
+      where: 'Setor / Projeto de Consultoria',
+      when: deadline || kr?.deadline || new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0],
+      startDate: new Date().toISOString().split('T')[0],
+      who: responsible || kr?.responsible || currentProject?.leadConsultant || 'Consultor',
+      how: 'Execução do plano de intervenção operacional acordado com os stakeholders',
+      howMuch: cost,
+      priority: 'Alta',
+      status: 'Não iniciada',
+      progressPercent: 0,
+      relatedOriginType: 'general',
+      relatedOriginId: krId,
+      notes: `Gerado a partir do OKR: ${okr?.title} (KR: ${kr?.title})`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    setActions5W2H((prev) => [newAction, ...prev]);
+    showToast('Plano de Ação 5W2H criado com sucesso a partir do Resultado-Chave!');
+  };
+
   // Pesquisa de Clima Organizacional & eNPS
   const addClimateSurvey = (survey: Omit<ClimateSurvey, 'id' | 'createdAt' | 'updatedAt' | 'projectId'>): string => {
     const newId = `climate-${Date.now()}`;
@@ -2163,13 +2204,18 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
         okrs,
         currentProjectOkrs,
+        currentProjectOKRs: currentProjectOkrs,
         addOkr,
         updateOkr,
         duplicateOkr,
         deleteOkr,
+        addObjective: addOkr,
+        updateObjective: updateOkr,
+        deleteObjective: deleteOkr,
         addKeyResult,
         updateKeyResult,
         deleteKeyResult,
+        convertKRTo5W2H,
 
         climateSurveys,
         currentProjectClimateSurveys,
