@@ -89,12 +89,12 @@ export const LoginView: React.FC = () => {
           </div>
           <div>
             <h1 className="text-lg font-bold text-slate-100 tracking-tight flex items-center gap-2">
-              Consultor Maker
+              CONSULTOR PRIME
               <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full border border-blue-500/30">
                 Enterprise
               </span>
             </h1>
-            <p className="text-xs text-slate-400">Plataforma Integrada de Gestão & Consultoria Estratégica</p>
+            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">O CANIVETE SUIÇO DO CONSULTOR</p>
           </div>
         </div>
 

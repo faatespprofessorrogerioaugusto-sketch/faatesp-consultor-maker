@@ -1,6 +1,6 @@
 {
-  "name": "Consultor Maker",
-  "description": "Plataforma profissional de consultoria e diagnósticos: Gestão Multi-projetos, SWOT, Gantt, Ishikawa, 5W2H, Matriz de Riscos, Pareto, PESTEL, Stakeholders, Canvas, OKRs, Pesquisa de Clima & eNPS e Relatórios Executivos.",
+  "name": "CONSULTOR PRIME",
+  "description": "CONSULTOR PRIME - O CANIVETE SUIÇO DO CONSULTOR: Plataforma profissional de consultoria e diagnósticos.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

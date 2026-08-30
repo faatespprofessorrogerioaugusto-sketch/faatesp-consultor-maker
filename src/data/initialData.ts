@@ -1037,7 +1037,7 @@ export const initialReportConfig: ConsultingReportConfig = {
   projectId: 'proj-1',
   title: 'Relatório Executivo de Diagnóstico & Plano de Ação Estratégico',
   subtitle: 'Projeto de Transformação Digital & Experiência Omnichannel',
-  consultantName: 'Roberto Andrade & Equipe Consultor Maker',
+  consultantName: 'Roberto Andrade & Equipe Consultor Prime',
   consultantRole: 'Consultor Líder de Estratégia e Operações',
   clientName: 'Grupo Varejo Brasil S.A.',
   date: '2026-02-27',
@@ -1451,9 +1451,9 @@ export const initialClimateSurveys: ClimateSurvey[] = [
 ];
 
 export const initialSettings: AppSettings = {
-  consultingFirmName: 'Consultor Maker',
-  consultancyName: 'Consultor Maker',
-  consultancyTagline: 'Excelência em Diagnóstico, Estratégia e Execução de Resultados',
+  consultingFirmName: 'Consultor Prime',
+  consultancyName: 'Consultor Prime',
+  consultancyTagline: 'O CANIVETE SUIÇO DO CONSULTOR',
   logoUrl: '',
   defaultConsultantName: 'Roberto Andrade (Consultor Sênior)',
   consultantDefaultName: 'Roberto Andrade (Consultor Sênior)',
@@ -1553,7 +1553,7 @@ export const initialContracts: ConsultingContract[] = [
     projectId: 'proj-1',
     title: 'Contrato de Prestação de Serviços de Consultoria Estratégica & Gestão',
     contractNumber: 'CM-2026/008-VB',
-    contractorFirm: 'Consultor Maker Assessoria Empresarial Ltda.',
+    contractorFirm: 'Consultor Prime Assessoria Empresarial Ltda.',
     contractorCnpj: '48.912.430/0001-92',
     contractorAddress: 'Av. Paulista, 1842 - 14º Andar, São Paulo - SP',
     contractorRep: 'Roberto Andrade',

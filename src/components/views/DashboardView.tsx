@@ -473,12 +473,12 @@ export const DashboardView: React.FC = () => {
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <button
-            onClick={() => setActiveModule('ishikawa')}
+            onClick={() => setActiveModule('gantt')}
             className="p-3.5 bg-slate-900 hover:bg-slate-850 hover:border-slate-700 rounded-lg text-left transition-colors border border-slate-800 cursor-pointer"
           >
-            <GitFork className="w-5 h-5 text-blue-400 mb-1.5" />
-            <p className="text-xs font-semibold text-slate-100">Ishikawa</p>
-            <p className="text-[10px] text-slate-400">{ishikawaProblemsCount} causas mapeadas</p>
+            <CalendarRange className="w-5 h-5 text-blue-400 mb-1.5" />
+            <p className="text-xs font-semibold text-slate-100">Diagrama de Gantt</p>
+            <p className="text-[10px] text-slate-400">{currentProjectTasks.length} entregas / {avgGanttProgress}% concluído</p>
           </button>
 
           <button
@@ -504,7 +504,7 @@ export const DashboardView: React.FC = () => {
             className="p-3.5 bg-slate-900 hover:bg-slate-850 hover:border-slate-700 rounded-lg text-left transition-colors border border-slate-800 cursor-pointer"
           >
             <HeartHandshake className="w-5 h-5 text-rose-400 mb-1.5" />
-            <p className="text-xs font-semibold text-slate-100">Clima & eNPS</p>
+            <p className="text-xs font-semibold text-slate-100">Clima Organizacional</p>
             <p className="text-[10px] text-slate-400">
               {currentProjectClimateSurveys.length > 0
                 ? `eNPS ${currentProjectClimateSurveys[0].enpsScore > 0 ? '+' : ''}${currentProjectClimateSurveys[0].enpsScore}`

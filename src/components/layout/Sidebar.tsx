@@ -203,10 +203,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {!isCollapsed && (
               <div className="min-w-0">
                 <span className="font-bold text-white text-base tracking-tight truncate block">
-                  CONSULTOR<span className="text-blue-500"> MAKER</span>
+                  CONSULTOR<span className="text-blue-500"> PRIME</span>
                 </span>
-                <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold truncate block">
-                  {settings.consultancyName || 'Suite Estratégica'}
+                <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold truncate block">
+                  O CANIVETE SUIÇO DO CONSULTOR
                 </span>
               </div>
             )}

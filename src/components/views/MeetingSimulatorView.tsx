@@ -113,7 +113,7 @@ export const MeetingSimulatorView: React.FC = () => {
         },
         {
           objection: 'Nossa equipe interna já está sobrecarregada para apoiar a consultoria.',
-          recommendedResponse: 'A metodologia do Consultor Maker assume 80% do esforço de análise e estruturação, exigindo apenas 1 hora semanal dos líderes.',
+          recommendedResponse: 'A metodologia do Consultor Prime assume 80% do esforço de análise e estruturação, exigindo apenas 1 hora semanal dos líderes.',
         },
       ],
       meetingNotes: '',

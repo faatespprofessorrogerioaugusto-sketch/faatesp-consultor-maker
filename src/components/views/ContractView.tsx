@@ -42,8 +42,8 @@ export const ContractView: React.FC = () => {
 
   const [formData, setFormData] = useState<Omit<ConsultingContract, 'id' | 'projectId'>>({
     title: 'Contrato de Prestação de Serviços de Consultoria Empresarial',
-    contractNumber: `CM-${new Date().getFullYear()}/${String(Math.floor(Math.random() * 900) + 100)}`,
-    contractorFirm: settings.consultingFirmName || 'Consultor Maker Assessoria Empresarial Ltda.',
+    contractNumber: `CP-${new Date().getFullYear()}/${String(Math.floor(Math.random() * 900) + 100)}`,
+    contractorFirm: settings.consultingFirmName || 'Consultor Prime Assessoria Empresarial Ltda.',
     contractorCnpj: '48.912.430/0001-92',
     contractorAddress: 'Av. Paulista, 1842 - 14º Andar, São Paulo - SP',
     contractorRep: settings.consultantDefaultName || 'Roberto Andrade',
@@ -75,8 +75,8 @@ export const ContractView: React.FC = () => {
     const client = clients.find((c) => c.name === currentProject?.clientName);
     const newContractData: Omit<ConsultingContract, 'id' | 'projectId'> = {
       title: `Contrato de Prestação de Serviço - ${currentProject?.name || 'Projeto'}`,
-      contractNumber: `CM-${new Date().getFullYear()}/${String(Math.floor(Math.random() * 900) + 100)}`,
-      contractorFirm: settings.consultingFirmName || 'Consultor Maker Assessoria Empresarial',
+      contractNumber: `CP-${new Date().getFullYear()}/${String(Math.floor(Math.random() * 900) + 100)}`,
+      contractorFirm: settings.consultingFirmName || 'Consultor Prime Assessoria Empresarial',
       contractorCnpj: '48.912.430/0001-92',
       contractorAddress: 'Av. Paulista, 1842 - 14º Andar, São Paulo - SP',
       contractorRep: settings.consultantDefaultName || 'Consultor Líder',

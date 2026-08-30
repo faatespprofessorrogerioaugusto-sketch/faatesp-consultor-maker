@@ -450,7 +450,7 @@ ${recommendations}
                 CH
               </div>
               <span className="text-sm font-bold tracking-tight text-slate-100 uppercase print:text-slate-900">
-                {settings.consultingFirmName || 'Consultor Maker Assessoria Empresarial'}
+                {settings.consultingFirmName || 'Consultor Prime Assessoria Empresarial'}
               </span>
             </div>
             <h1 className="text-2xl font-black text-slate-100 tracking-tight mt-2 print:text-slate-900">
