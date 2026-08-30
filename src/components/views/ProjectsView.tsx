@@ -362,6 +362,14 @@ export const ProjectsView: React.FC = () => {
           <input
             id="search-projects-input"
             type="text"
+            name="search_projects_query_field"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
+            data-lpignore="true"
+            data-1p-ignore="true"
+            data-form-type="other"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar por nome, cliente, grupo ou consultor..."
@@ -645,7 +653,12 @@ export const ProjectsView: React.FC = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSaveForm} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+            <form
+              onSubmit={handleSaveForm}
+              autoComplete="off"
+              noValidate
+              className="p-6 space-y-4 max-h-[75vh] overflow-y-auto"
+            >
               {/* Name */}
               <div>
                 <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
@@ -654,6 +667,14 @@ export const ProjectsView: React.FC = () => {
                 <input
                   id="project-form-name-input"
                   type="text"
+                  name="project_title_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -684,6 +705,14 @@ export const ProjectsView: React.FC = () => {
                   ) : (
                     <input
                       type="text"
+                      name="project_client_name_unique_field"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      spellCheck={false}
+                      data-lpignore="true"
+                      data-1p-ignore="true"
+                      data-form-type="other"
                       required
                       value={formData.clientName}
                       onChange={(e) =>
@@ -701,6 +730,14 @@ export const ProjectsView: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    name="project_segment_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={formData.segment}
                     onChange={(e) => setFormData({ ...formData, segment: e.target.value })}
                     placeholder="Ex: Varejo, Saúde, Tecnologia, Indústria"
@@ -716,6 +753,14 @@ export const ProjectsView: React.FC = () => {
                 </label>
                 <textarea
                   rows={2}
+                  name="project_objective_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   required
                   value={formData.mainObjective}
                   onChange={(e) => setFormData({ ...formData, mainObjective: e.target.value })}
@@ -731,6 +776,14 @@ export const ProjectsView: React.FC = () => {
                 </label>
                 <textarea
                   rows={2}
+                  name="project_desc_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Detalhes adicionais sobre o escopo acordado e entregáveis."
@@ -746,6 +799,14 @@ export const ProjectsView: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    name="project_lead_consultant_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     required
                     value={formData.leadConsultant}
                     onChange={(e) => setFormData({ ...formData, leadConsultant: e.target.value })}
@@ -760,6 +821,14 @@ export const ProjectsView: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    name="project_team_members_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={formData.team}
                     onChange={(e) => setFormData({ ...formData, team: e.target.value })}
                     placeholder="Ex: Ana Silva, Bruno Souza, Carlos Lima"
@@ -839,6 +908,14 @@ export const ProjectsView: React.FC = () => {
                   </label>
                   <input
                     type="number"
+                    name="project_budget_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={formData.budget}
                     onChange={(e) => setFormData({ ...formData, budget: Number(e.target.value) })}
                     placeholder="0.00"
@@ -852,6 +929,14 @@ export const ProjectsView: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    name="project_notes_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                     placeholder="Notas internas ou observações de contrato"

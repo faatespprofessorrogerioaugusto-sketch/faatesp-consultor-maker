@@ -584,7 +584,12 @@ export const StakeholdersView: React.FC = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSaveForm} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+            <form
+              onSubmit={handleSaveForm}
+              autoComplete="off"
+              noValidate
+              className="p-6 space-y-4 max-h-[75vh] overflow-y-auto"
+            >
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
@@ -592,6 +597,14 @@ export const StakeholdersView: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    name="stakeholder_name_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -606,6 +619,14 @@ export const StakeholdersView: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    name="stakeholder_role_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                     placeholder="Ex: Diretora de Operações"
@@ -707,6 +728,14 @@ export const StakeholdersView: React.FC = () => {
                 </label>
                 <textarea
                   rows={2}
+                  name="stakeholder_expectations_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   value={formData.expectations}
                   onChange={(e) => setFormData({ ...formData, expectations: e.target.value })}
                   placeholder="O que essa parte espera do projeto?"
@@ -720,6 +749,14 @@ export const StakeholdersView: React.FC = () => {
                 </label>
                 <textarea
                   rows={2}
+                  name="stakeholder_actions_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   value={formData.engagementActions}
                   onChange={(e) => setFormData({ ...formData, engagementActions: e.target.value })}
                   placeholder="Como manter alinhado e engajado?"

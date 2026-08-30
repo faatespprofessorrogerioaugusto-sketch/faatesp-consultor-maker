@@ -87,7 +87,12 @@ export const SettingsView: React.FC = () => {
         subtitle="Personalização da consultoria, parâmetros de análise de risco e gestão de dados"
       />
 
-      <form onSubmit={handleSave} className="space-y-6">
+      <form
+        onSubmit={handleSave}
+        autoComplete="off"
+        noValidate
+        className="space-y-6"
+      >
         {/* Consulting Profile */}
         <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-sm space-y-4">
           <div className="flex items-center gap-2 pb-3 border-b border-slate-800">
@@ -102,6 +107,14 @@ export const SettingsView: React.FC = () => {
               </label>
               <input
                 type="text"
+                name="settings_firm_name_field"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                data-lpignore="true"
+                data-1p-ignore="true"
+                data-form-type="other"
                 value={formSettings.consultingFirmName}
                 onChange={(e) =>
                   setFormSettings({ ...formSettings, consultingFirmName: e.target.value })
@@ -116,6 +129,14 @@ export const SettingsView: React.FC = () => {
               </label>
               <input
                 type="text"
+                name="settings_default_consultant_field"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                data-lpignore="true"
+                data-1p-ignore="true"
+                data-form-type="other"
                 value={formSettings.defaultConsultantName}
                 onChange={(e) =>
                   setFormSettings({ ...formSettings, defaultConsultantName: e.target.value })
@@ -182,6 +203,14 @@ export const SettingsView: React.FC = () => {
                 type="number"
                 min={1}
                 max={25}
+                name="settings_risk_critical_field"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                data-lpignore="true"
+                data-1p-ignore="true"
+                data-form-type="other"
                 value={formSettings.riskScoreThresholds.critical}
                 onChange={(e) =>
                   setFormSettings({
@@ -204,6 +233,14 @@ export const SettingsView: React.FC = () => {
                 type="number"
                 min={1}
                 max={25}
+                name="settings_risk_high_field"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                data-lpignore="true"
+                data-1p-ignore="true"
+                data-form-type="other"
                 value={formSettings.riskScoreThresholds.high}
                 onChange={(e) =>
                   setFormSettings({
@@ -226,6 +263,14 @@ export const SettingsView: React.FC = () => {
                 type="number"
                 min={1}
                 max={25}
+                name="settings_risk_moderate_field"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                data-lpignore="true"
+                data-1p-ignore="true"
+                data-form-type="other"
                 value={formSettings.riskScoreThresholds.moderate}
                 onChange={(e) =>
                   setFormSettings({

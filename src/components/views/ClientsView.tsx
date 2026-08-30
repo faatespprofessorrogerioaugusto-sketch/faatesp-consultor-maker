@@ -151,6 +151,14 @@ export const ClientsView: React.FC = () => {
               <input
                 id="search-clients-input"
                 type="text"
+                name="search_clients_filter_field"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                data-lpignore="true"
+                data-1p-ignore="true"
+                data-form-type="other"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Buscar cliente, contato ou cidade..."
@@ -368,13 +376,26 @@ export const ClientsView: React.FC = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSaveForm} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+            <form
+              onSubmit={handleSaveForm}
+              autoComplete="off"
+              noValidate
+              className="p-6 space-y-4 max-h-[75vh] overflow-y-auto"
+            >
               <div>
                 <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
                   Nome da Organização / Pessoa <span className="text-rose-400">*</span>
                 </label>
                 <input
                   type="text"
+                  name="client_org_name_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -390,6 +411,14 @@ export const ClientsView: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    name="client_contact_person_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     required
                     value={formData.contactPerson}
                     onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
@@ -404,6 +433,14 @@ export const ClientsView: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    name="client_role_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                     placeholder="Ex: Diretora de Operações"
@@ -419,6 +456,14 @@ export const ClientsView: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    name="client_phone_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="+55 (11) 98765-4321"
@@ -432,9 +477,10 @@ export const ClientsView: React.FC = () => {
                   </label>
                   <input
                     type="text"
-                    name="client_contact_email_unique"
+                    name="client_contact_email_unique_field"
                     autoComplete="off"
                     autoCorrect="off"
+                    autoCapitalize="off"
                     spellCheck={false}
                     data-lpignore="true"
                     data-1p-ignore="true"
@@ -454,6 +500,14 @@ export const ClientsView: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    name="client_city_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                     placeholder="São Paulo"
@@ -467,6 +521,14 @@ export const ClientsView: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    name="client_country_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={formData.country}
                     onChange={(e) => setFormData({ ...formData, country: e.target.value })}
                     placeholder="Brasil"
@@ -482,6 +544,14 @@ export const ClientsView: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    name="client_segment_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={formData.segment}
                     onChange={(e) => setFormData({ ...formData, segment: e.target.value })}
                     placeholder="Varejo, Tecnologia..."
@@ -495,6 +565,14 @@ export const ClientsView: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    name="client_origin_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={formData.relationshipOrigin}
                     onChange={(e) => setFormData({ ...formData, relationshipOrigin: e.target.value })}
                     placeholder="Indicação, Evento..."
@@ -530,6 +608,14 @@ export const ClientsView: React.FC = () => {
                 </label>
                 <textarea
                   rows={3}
+                  name="client_notes_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   placeholder="Informações relevantes sobre a conta e relacionamento."

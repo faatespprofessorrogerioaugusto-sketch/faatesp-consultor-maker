@@ -23,7 +23,7 @@ const moduleNames: Record<ModuleId, string> = {
   '5w2h': 'Plano de Ação (5W2H)',
   risks: 'Matriz de Riscos',
   pareto: 'Diagrama de Pareto',
-  climate: 'Pesquisa de Clima',
+  climate: 'Pesquisa de Clima Organizacional',
   reports: 'Relatórios Executivos',
   settings: 'Configurações',
 };

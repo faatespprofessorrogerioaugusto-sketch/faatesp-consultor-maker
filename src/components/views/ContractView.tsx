@@ -265,7 +265,12 @@ export const ContractView: React.FC = () => {
         </div>
       ) : activeTab === 'edit' ? (
         /* Edit Form */
-        <form onSubmit={handleSaveEdit} className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-6">
+        <form
+          onSubmit={handleSaveEdit}
+          autoComplete="off"
+          noValidate
+          className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-6"
+        >
           <div className="flex items-center justify-between pb-4 border-b border-slate-800">
             <h2 className="text-base font-bold text-white flex items-center gap-2">
               <Edit3 className="w-5 h-5 text-blue-400" />
@@ -286,6 +291,14 @@ export const ContractView: React.FC = () => {
                 <label className="block text-[11px] font-semibold text-slate-300 mb-1">Razão Social / Nome Fantasia</label>
                 <input
                   type="text"
+                  name="contractor_firm_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   value={formData.contractorFirm}
                   onChange={(e) => setFormData({ ...formData, contractorFirm: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white"
@@ -296,6 +309,14 @@ export const ContractView: React.FC = () => {
                   <label className="block text-[11px] font-semibold text-slate-300 mb-1">CNPJ</label>
                   <input
                     type="text"
+                    name="contractor_cnpj_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={formData.contractorCnpj}
                     onChange={(e) => setFormData({ ...formData, contractorCnpj: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white"
@@ -305,6 +326,14 @@ export const ContractView: React.FC = () => {
                   <label className="block text-[11px] font-semibold text-slate-300 mb-1">Representante Legal</label>
                   <input
                     type="text"
+                    name="contractor_rep_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={formData.contractorRep}
                     onChange={(e) => setFormData({ ...formData, contractorRep: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white"
@@ -315,6 +344,14 @@ export const ContractView: React.FC = () => {
                 <label className="block text-[11px] font-semibold text-slate-300 mb-1">Endereço Sede</label>
                 <input
                   type="text"
+                  name="contractor_address_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   value={formData.contractorAddress}
                   onChange={(e) => setFormData({ ...formData, contractorAddress: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white"
@@ -331,6 +368,14 @@ export const ContractView: React.FC = () => {
                 <label className="block text-[11px] font-semibold text-slate-300 mb-1">Empresa / Razão Social</label>
                 <input
                   type="text"
+                  name="client_company_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   value={formData.clientCompany}
                   onChange={(e) => setFormData({ ...formData, clientCompany: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white"
@@ -341,6 +386,14 @@ export const ContractView: React.FC = () => {
                   <label className="block text-[11px] font-semibold text-slate-300 mb-1">CNPJ / CPF</label>
                   <input
                     type="text"
+                    name="client_cnpj_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={formData.clientCnpj}
                     onChange={(e) => setFormData({ ...formData, clientCnpj: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white"
@@ -350,6 +403,14 @@ export const ContractView: React.FC = () => {
                   <label className="block text-[11px] font-semibold text-slate-300 mb-1">Representante Legal</label>
                   <input
                     type="text"
+                    name="client_rep_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={formData.clientRep}
                     onChange={(e) => setFormData({ ...formData, clientRep: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white"
@@ -360,6 +421,14 @@ export const ContractView: React.FC = () => {
                 <label className="block text-[11px] font-semibold text-slate-300 mb-1">Endereço do Cliente</label>
                 <input
                   type="text"
+                  name="client_address_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   value={formData.clientAddress}
                   onChange={(e) => setFormData({ ...formData, clientAddress: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white"
@@ -376,6 +445,14 @@ export const ContractView: React.FC = () => {
               </label>
               <textarea
                 rows={3}
+                name="contract_scope_unique_field"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                data-lpignore="true"
+                data-1p-ignore="true"
+                data-form-type="other"
                 value={formData.scope}
                 onChange={(e) => setFormData({ ...formData, scope: e.target.value })}
                 className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
@@ -388,6 +465,14 @@ export const ContractView: React.FC = () => {
               </label>
               <textarea
                 rows={2}
+                name="contract_methodology_unique_field"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                data-lpignore="true"
+                data-1p-ignore="true"
+                data-form-type="other"
                 value={formData.methodology}
                 onChange={(e) => setFormData({ ...formData, methodology: e.target.value })}
                 className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
@@ -401,6 +486,14 @@ export const ContractView: React.FC = () => {
                 </label>
                 <input
                   type="number"
+                  name="contract_value_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   value={formData.totalValue}
                   onChange={(e) => setFormData({ ...formData, totalValue: parseFloat(e.target.value) || 0 })}
                   className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
@@ -412,6 +505,14 @@ export const ContractView: React.FC = () => {
                 </label>
                 <input
                   type="number"
+                  name="contract_duration_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   value={formData.durationMonths}
                   onChange={(e) => setFormData({ ...formData, durationMonths: parseInt(e.target.value) || 1 })}
                   className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
@@ -423,6 +524,14 @@ export const ContractView: React.FC = () => {
                 </label>
                 <input
                   type="text"
+                  name="contract_forum_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   value={formData.forumCity}
                   onChange={(e) => setFormData({ ...formData, forumCity: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"
@@ -436,6 +545,14 @@ export const ContractView: React.FC = () => {
               </label>
               <input
                 type="text"
+                name="contract_payment_unique_field"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                data-lpignore="true"
+                data-1p-ignore="true"
+                data-form-type="other"
                 value={formData.paymentTerms}
                 onChange={(e) => setFormData({ ...formData, paymentTerms: e.target.value })}
                 className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white"

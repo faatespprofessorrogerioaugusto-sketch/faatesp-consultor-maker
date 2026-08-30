@@ -283,6 +283,14 @@ export const Action5W2HView: React.FC = () => {
           <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
+            name="search_5w2h_query_field"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
+            data-lpignore="true"
+            data-1p-ignore="true"
+            data-form-type="other"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar por O que, Por que, Quem ou Como..."
@@ -528,7 +536,12 @@ export const Action5W2HView: React.FC = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSaveForm} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+            <form
+              onSubmit={handleSaveForm}
+              autoComplete="off"
+              noValidate
+              className="p-6 space-y-4 max-h-[75vh] overflow-y-auto"
+            >
               {/* WHAT */}
               <div>
                 <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
@@ -536,6 +549,14 @@ export const Action5W2HView: React.FC = () => {
                 </label>
                 <input
                   type="text"
+                  name="action_5w2h_what_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   required
                   value={formData.what}
                   onChange={(e) => setFormData({ ...formData, what: e.target.value })}
@@ -551,6 +572,14 @@ export const Action5W2HView: React.FC = () => {
                 </label>
                 <textarea
                   rows={2}
+                  name="action_5w2h_why_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   value={formData.why}
                   onChange={(e) => setFormData({ ...formData, why: e.target.value })}
                   placeholder="Ex: Eliminar gargalos no atendimento e reduzir turnover em 15%"
@@ -566,6 +595,14 @@ export const Action5W2HView: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    name="action_5w2h_where_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={formData.where}
                     onChange={(e) => setFormData({ ...formData, where: e.target.value })}
                     placeholder="Ex: Operações / Filial SP"
@@ -592,6 +629,14 @@ export const Action5W2HView: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    name="action_5w2h_who_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     required
                     value={formData.who}
                     onChange={(e) => setFormData({ ...formData, who: e.target.value })}
@@ -608,6 +653,14 @@ export const Action5W2HView: React.FC = () => {
                 </label>
                 <textarea
                   rows={2}
+                  name="action_5w2h_how_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   value={formData.how}
                   onChange={(e) => setFormData({ ...formData, how: e.target.value })}
                   placeholder="Ex: Realizar workshops com analistas, montar manual de processos e treinar equipe."
@@ -623,6 +676,14 @@ export const Action5W2HView: React.FC = () => {
                   </label>
                   <input
                     type="number"
+                    name="action_5w2h_howmuch_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={formData.howMuch}
                     onChange={(e) => setFormData({ ...formData, howMuch: Number(e.target.value) })}
                     placeholder="0.00"
@@ -690,6 +751,14 @@ export const Action5W2HView: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    name="action_5w2h_evidence_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={formData.deliverableEvidence}
                     onChange={(e) => setFormData({ ...formData, deliverableEvidence: e.target.value })}
                     placeholder="Ex: Documento homologado / Ata de reunião"
@@ -704,6 +773,14 @@ export const Action5W2HView: React.FC = () => {
                 </label>
                 <input
                   type="text"
+                  name="action_5w2h_tool_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   value={formData.relatedTool}
                   onChange={(e) => setFormData({ ...formData, relatedTool: e.target.value })}
                   placeholder="Ex: Causa raiz Ishikawa 'Falta de padronização' / Risco Crítico R1"

@@ -545,6 +545,14 @@ export const OkrsView: React.FC = () => {
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
             <input
               type="text"
+              name="search_okrs_query_field"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
+              data-lpignore="true"
+              data-1p-ignore="true"
+              data-form-type="other"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar por objetivo, indicador ou responsável..."
@@ -878,13 +886,26 @@ export const OkrsView: React.FC = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSaveObj} className="p-6 space-y-4">
+            <form
+              onSubmit={handleSaveObj}
+              autoComplete="off"
+              noValidate
+              className="p-6 space-y-4"
+            >
               <div>
                 <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
                   Enunciado do Objetivo <span className="text-rose-400">*</span>
                 </label>
                 <input
                   type="text"
+                  name="okr_obj_title_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   required
                   value={objForm.title}
                   onChange={(e) => setObjForm({ ...objForm, title: e.target.value })}
@@ -917,6 +938,14 @@ export const OkrsView: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    name="okr_obj_cycle_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={objForm.cycle}
                     onChange={(e) => setObjForm({ ...objForm, cycle: e.target.value })}
                     placeholder="Ex: Q1 2025"
@@ -930,6 +959,14 @@ export const OkrsView: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    name="okr_obj_owner_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={objForm.owner}
                     onChange={(e) => setObjForm({ ...objForm, owner: e.target.value })}
                     className="w-full text-xs bg-slate-800 border border-slate-700 text-slate-100 rounded-lg p-2.5 focus:outline-none placeholder:text-slate-500"
@@ -943,6 +980,14 @@ export const OkrsView: React.FC = () => {
                 </label>
                 <textarea
                   rows={2}
+                  name="okr_obj_desc_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   value={objForm.description}
                   onChange={(e) => setObjForm({ ...objForm, description: e.target.value })}
                   placeholder="Por que este objetivo é a prioridade estratégica da organização no momento?"
@@ -989,13 +1034,26 @@ export const OkrsView: React.FC = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSaveKr} className="p-6 space-y-4">
+            <form
+              onSubmit={handleSaveKr}
+              autoComplete="off"
+              noValidate
+              className="p-6 space-y-4"
+            >
               <div>
                 <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
                   Enunciado do Key Result <span className="text-rose-400">*</span>
                 </label>
                 <input
                   type="text"
+                  name="okr_kr_title_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   required
                   value={krForm.title}
                   onChange={(e) => setKrForm({ ...krForm, title: e.target.value })}
@@ -1012,6 +1070,14 @@ export const OkrsView: React.FC = () => {
                   </label>
                   <input
                     type="number"
+                    name="okr_kr_initial_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={krForm.initialValue}
                     onChange={(e) =>
                       setKrForm({ ...krForm, initialValue: Number(e.target.value) })
@@ -1026,6 +1092,14 @@ export const OkrsView: React.FC = () => {
                   </label>
                   <input
                     type="number"
+                    name="okr_kr_target_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     required
                     value={krForm.targetValue}
                     onChange={(e) =>
@@ -1041,6 +1115,14 @@ export const OkrsView: React.FC = () => {
                   </label>
                   <input
                     type="number"
+                    name="okr_kr_current_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={krForm.currentValue}
                     onChange={(e) =>
                       setKrForm({ ...krForm, currentValue: Number(e.target.value) })
@@ -1055,6 +1137,14 @@ export const OkrsView: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    name="okr_kr_unit_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={krForm.unit}
                     onChange={(e) => setKrForm({ ...krForm, unit: e.target.value })}
                     placeholder="%, R$, dias"
@@ -1112,6 +1202,14 @@ export const OkrsView: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    name="okr_kr_owner_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={krForm.owner}
                     onChange={(e) => setKrForm({ ...krForm, owner: e.target.value })}
                     className="w-full text-xs bg-slate-800 border border-slate-700 text-slate-100 rounded-lg p-2.5 focus:outline-none placeholder:text-slate-500"
@@ -1176,7 +1274,12 @@ export const OkrsView: React.FC = () => {
               </button>
             </div>
 
-            <form onSubmit={handleConvertSubmit} className="p-6 space-y-4">
+            <form
+              onSubmit={handleConvertSubmit}
+              autoComplete="off"
+              noValidate
+              className="p-6 space-y-4"
+            >
               <div className="p-3 bg-slate-950/70 rounded-lg border border-slate-800 space-y-1 text-xs">
                 <p className="text-slate-400">
                   Objetivo Estratégico: <strong className="text-slate-200">{convertTarget.objTitle}</strong>
@@ -1192,6 +1295,14 @@ export const OkrsView: React.FC = () => {
                 </label>
                 <textarea
                   rows={2}
+                  name="okr_convert_what_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   required
                   value={convertForm.what}
                   onChange={(e) => setConvertForm({ ...convertForm, what: e.target.value })}
@@ -1206,6 +1317,14 @@ export const OkrsView: React.FC = () => {
                   </label>
                   <input
                     type="text"
+                    name="okr_convert_who_unique_field"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
                     value={convertForm.who}
                     onChange={(e) => setConvertForm({ ...convertForm, who: e.target.value })}
                     className="w-full text-xs bg-slate-800 border border-slate-700 text-slate-100 rounded-lg p-2.5 focus:outline-none placeholder:text-slate-500"
@@ -1231,6 +1350,14 @@ export const OkrsView: React.FC = () => {
                 </label>
                 <input
                   type="number"
+                  name="okr_convert_cost_unique_field"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   value={convertForm.cost}
                   onChange={(e) => setConvertForm({ ...convertForm, cost: Number(e.target.value) })}
                   className="w-full text-xs bg-slate-800 border border-slate-700 text-slate-100 rounded-lg p-2.5 focus:outline-none"

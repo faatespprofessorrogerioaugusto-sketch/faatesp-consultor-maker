@@ -11,6 +11,121 @@
   </head>
   <body class="bg-slate-50 text-slate-900 antialiased selection:bg-blue-600 selection:text-white min-h-screen">
     <div id="root"></div>
+    <script>
+      // Universal Anti-Autofill & Anti-Address-Manager Engine
+      (function() {
+        var textTypes = ['text', 'search', 'email', 'tel', 'url', 'number', 'password', ''];
+        
+        function sanitizeElement(el) {
+          if (!el || el.nodeType !== 1) return;
+
+          if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+            var type = (el.getAttribute('type') || 'text').toLowerCase();
+            
+            // Set attributes that aggressively disable Chrome/Edge address & credential popups
+            el.setAttribute('autocomplete', 'new-password');
+            el.setAttribute('autocorrect', 'off');
+            el.setAttribute('autocapitalize', 'off');
+            el.setAttribute('spellcheck', 'false');
+            el.setAttribute('data-lpignore', 'true');
+            el.setAttribute('data-1p-ignore', 'true');
+            el.setAttribute('data-form-type', 'other');
+            el.setAttribute('data-bwignore', 'true');
+            el.setAttribute('aria-autocomplete', 'none');
+
+            // Apply readonly trick to text-based inputs so Chrome ignores on click/focus
+            if (textTypes.indexOf(type) !== -1) {
+              if (document.activeElement !== el) {
+                el.setAttribute('readonly', 'readonly');
+              }
+
+              if (!el.__antiAutofillBound) {
+                el.__antiAutofillBound = true;
+                
+                var unlock = function() {
+                  if (el.hasAttribute('readonly')) {
+                    el.removeAttribute('readonly');
+                  }
+                };
+
+                el.addEventListener('pointerdown', unlock, { passive: true });
+                el.addEventListener('mousedown', unlock, { passive: true });
+                el.addEventListener('touchstart', unlock, { passive: true });
+                el.addEventListener('focus', unlock, { passive: true });
+                el.addEventListener('keydown', unlock, { passive: true });
+
+                el.addEventListener('blur', function() {
+                  setTimeout(function() {
+                    if (document.activeElement !== el) {
+                      el.setAttribute('readonly', 'readonly');
+                    }
+                  }, 100);
+                }, { passive: true });
+              }
+            }
+          }
+
+          if (el.tagName === 'FORM') {
+            el.setAttribute('autocomplete', 'off');
+            el.setAttribute('novalidate', 'true');
+            el.setAttribute('data-lpignore', 'true');
+            el.setAttribute('data-1p-ignore', 'true');
+          }
+        }
+
+        // Global capture-phase listeners
+        document.addEventListener('pointerdown', function(e) {
+          if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+            sanitizeElement(e.target);
+            if (e.target.hasAttribute('readonly')) {
+              e.target.removeAttribute('readonly');
+            }
+          }
+        }, true);
+
+        document.addEventListener('focusin', function(e) {
+          if (e.target) {
+            sanitizeElement(e.target);
+            if (e.target.hasAttribute('readonly')) {
+              e.target.removeAttribute('readonly');
+            }
+          }
+        }, true);
+
+        function scanAll() {
+          var elements = document.querySelectorAll('input, textarea, form');
+          for (var i = 0; i < elements.length; i++) {
+            sanitizeElement(elements[i]);
+          }
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', scanAll);
+        } else {
+          scanAll();
+        }
+
+        var observer = new MutationObserver(function(mutations) {
+          for (var i = 0; i < mutations.length; i++) {
+            var mutation = mutations[i];
+            for (var j = 0; j < mutation.addedNodes.length; j++) {
+              var node = mutation.addedNodes[j];
+              if (node.nodeType === 1) {
+                sanitizeElement(node);
+                if (node.querySelectorAll) {
+                  var children = node.querySelectorAll('input, textarea, form');
+                  for (var k = 0; k < children.length; k++) {
+                    sanitizeElement(children[k]);
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        observer.observe(document.documentElement, { childList: true, subtree: true });
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
