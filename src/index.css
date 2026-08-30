@@ -15,7 +15,9 @@
 /* Universal Anti-Autofill & Anti-Password-Manager overlays */
 input::-webkit-contacts-auto-fill-button,
 input::-webkit-credentials-auto-fill-button,
-input::-webkit-caps-lock-indicator {
+input::-webkit-strong-password-auto-fill-button,
+input::-webkit-caps-lock-indicator,
+input::-webkit-input-speech-button {
   visibility: hidden !important;
   display: none !important;
   pointer-events: none !important;
