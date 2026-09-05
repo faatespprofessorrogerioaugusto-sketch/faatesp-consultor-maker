@@ -30,6 +30,7 @@ import {
   ExternalLink,
   ShieldCheck,
   Eye,
+  FileText,
 } from 'lucide-react';
 
 // Format date to Brazilian standard (dd/mm/aaaa)
@@ -582,6 +583,19 @@ export const ProjectsView: React.FC = () => {
 
                   {isFromCurrentGroup ? (
                     <div className="flex items-center gap-1">
+                      <button
+                        id={`plan-project-btn-${project.id}`}
+                        onClick={() => {
+                          setCurrentProjectId(project.id);
+                          setActiveModule('consultingPlan');
+                        }}
+                        className="px-2.5 py-1.5 text-xs font-semibold text-emerald-400 hover:text-white bg-emerald-950/40 hover:bg-emerald-700/60 rounded-lg border border-emerald-600/40 flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
+                        title="Abrir o Plano de Consultoria deste projeto"
+                      >
+                        <FileText className="w-3.5 h-3.5" />
+                        Plano
+                      </button>
+
                       <button
                         id={`edit-project-btn-${project.id}`}
                         onClick={() => openEditModal(project)}

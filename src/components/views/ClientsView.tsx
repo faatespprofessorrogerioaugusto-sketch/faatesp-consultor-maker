@@ -18,6 +18,7 @@ import {
   ArrowRight,
   User,
   Building,
+  FileText,
 } from 'lucide-react';
 
 // Format date to Brazilian standard (dd/mm/aaaa)
@@ -241,6 +242,19 @@ export const ClientsView: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-2">
+                  {clientProjects.length > 0 && (
+                    <button
+                      onClick={() => {
+                        setCurrentProjectId(clientProjects[0].id);
+                        setActiveModule('consultingPlan');
+                      }}
+                      className="px-3 py-1.5 text-xs font-semibold bg-blue-600/20 text-blue-300 hover:bg-blue-600 hover:text-white rounded-lg transition-colors flex items-center gap-1.5 border border-blue-500/40 cursor-pointer shadow-xs"
+                      title="Abrir o Plano de Consultoria deste cliente"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      Plano de Consultoria
+                    </button>
+                  )}
                   <button
                     onClick={() => openEditModal(selectedClient)}
                     className="px-3 py-1.5 text-xs font-semibold bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors flex items-center gap-1 border border-slate-700 cursor-pointer"
@@ -327,6 +341,17 @@ export const ClientsView: React.FC = () => {
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
                             <StatusBadge status={proj.status} size="sm" />
+                            <button
+                              onClick={() => {
+                                setCurrentProjectId(proj.id);
+                                setActiveModule('consultingPlan');
+                              }}
+                              className="px-2.5 py-1 text-xs font-semibold text-emerald-400 hover:text-white bg-emerald-950/40 hover:bg-emerald-700/60 rounded border border-emerald-600/40 flex items-center gap-1 cursor-pointer transition-colors"
+                              title="Visualizar Plano de Consultoria deste projeto"
+                            >
+                              <FileText className="w-3 h-3" />
+                              Plano
+                            </button>
                             <button
                               onClick={() => {
                                 setCurrentProjectId(proj.id);

@@ -2,6 +2,7 @@ export type ModuleId =
   | 'dashboard'
   | 'projects'
   | 'clients'
+  | 'consultingPlan'
   | 'swot'
   | 'okrs'
   | 'bsc'
@@ -645,5 +646,61 @@ export interface MeetingSimulation {
   meetingNotes: string;
   actionItemsGenerated: string[];
   status: 'planned' | 'in_progress' | 'completed';
+}
+
+/* 20. Plano de Consultoria (Modelo Oficial) */
+export interface ConsultingPlanPhaseItem {
+  id?: string;
+  stage: string; // 'Primeiro contato e levantamento inicial' | 'Diagnóstico' | 'Planejamento das ações' | 'Implementação' | 'Avaliação e encerramento'
+  description: string;
+  estimatedDeadline: string; // Ex: "15 dias" ou "15/03/2026"
+  responsibleRole: string; // Ex: "Consultor Líder / Roberto Andrade"
+}
+
+export interface ConsultingPlan {
+  id: string;
+  projectId: string;
+  
+  // 1. Identificação
+  clientName: string;
+  clientContactPerson?: string;
+  clientRole?: string;
+  clientEmail?: string;
+  clientPhone?: string;
+  consultants: string;
+  groupName?: string;
+  elaborationDate: string;
+
+  // 2. Descrição do Problema ou Oportunidade
+  problemDescription: string;
+  problemPerceptionContext?: string;
+  prioritizedPainPoints?: string[];
+
+  // 3. Objetivos do Trabalho
+  objectives: string[];
+
+  // 4. Metodologias e Ferramentas
+  methodologiesAndTools: string;
+  selectedToolsList?: string[];
+
+  // 5. Cronograma das Fases do Processo
+  phases: ConsultingPlanPhaseItem[];
+
+  // 6. Recursos Necessários
+  humanResources: string;
+  materialTechResources: string;
+  dataAccessDocuments: string;
+
+  // 7. Indicadores de Sucesso
+  successIndicators: string[];
+
+  // 8. Observações Gerais
+  generalObservations: string;
+
+  // Metadata
+  version?: number;
+  status?: 'rascunho' | 'em_revisao' | 'aprovado' | 'concluido';
+  updatedAt?: string;
+  createdAt?: string;
 }
 

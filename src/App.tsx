@@ -12,6 +12,7 @@ import { ProjectsView } from './components/views/ProjectsView';
 import { ClientsView } from './components/views/ClientsView';
 import { OkrsView } from './components/views/OkrsView';
 import { ContractView } from './components/views/ContractView';
+import { ConsultingPlanView } from './components/views/ConsultingPlanView';
 import { MeetingSimulatorView } from './components/views/MeetingSimulatorView';
 import { SwotView } from './components/views/SwotView';
 import { GanttView } from './components/views/GanttView';
@@ -44,6 +45,8 @@ const MainContent: React.FC = () => {
         return <ProjectsView />;
       case 'clients':
         return <ClientsView />;
+      case 'consultingPlan':
+        return <ConsultingPlanView />;
       case 'okrs':
       case 'bsc':
         return <OkrsView />;

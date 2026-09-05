@@ -13,6 +13,7 @@ const moduleNames: Record<ModuleId, string> = {
   dashboard: 'Dashboard Geral',
   projects: 'Projetos de Consultoria',
   clients: 'Cadastro de Clientes',
+  consultingPlan: 'Plano de Consultoria',
   contract: 'Contrato de Prestação de Serviços',
   meeting: 'Simulador de Reunião',
   okrs: 'OKR',

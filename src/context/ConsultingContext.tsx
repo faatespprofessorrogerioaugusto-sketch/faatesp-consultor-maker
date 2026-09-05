@@ -29,7 +29,10 @@ import {
   BSCObjective,
   ConsultingContract,
   MeetingSimulation,
+  ConsultingPlan,
+  ConsultingPlanPhaseItem,
 } from '../types';
+import { generatePlanForProject } from '../utils/planGenerator';
 import {
   initialClients,
   initialProjects,
@@ -197,6 +200,13 @@ interface ConsultingContextType {
   updateContract: (id: string, contract: Partial<ConsultingContract>) => void;
   deleteContract: (id: string) => void;
 
+  // Plano de Consultoria (Modelo Oficial)
+  consultingPlans: ConsultingPlan[];
+  currentProjectPlan?: ConsultingPlan;
+  saveConsultingPlan: (plan: Partial<ConsultingPlan> & { projectId: string }) => void;
+  syncPlanWithProjectData: (projectId: string) => ConsultingPlan;
+  deleteConsultingPlan: (id: string) => void;
+
   // Simulador de Reuniões
   meetings: MeetingSimulation[];
   addMeeting: (meeting: Omit<MeetingSimulation, 'id' | 'projectId'>) => void;
@@ -305,6 +315,7 @@ export const loadDataForGroup = (groupName: string, userEmail: string = '') => {
       climateSurveys: getSaved<ClimateSurvey[]>('climate', []),
       bscObjectives: getSaved<BSCObjective[]>('bsc_objectives', initialBscObjectives),
       contracts: getSaved<ConsultingContract[]>('contracts', initialContracts),
+      consultingPlans: getSaved<ConsultingPlan[]>('consulting_plans', []),
       meetings: getSaved<MeetingSimulation[]>('meetings', initialMeetings),
       reportConfig: getSaved<ConsultingReportConfig>('report', initialReportConfig),
       settings: getSaved<AppSettings>('settings', { ...initialSettings, consultancyName: groupName }),
@@ -370,6 +381,7 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [climateSurveys, setClimateSurveys] = useState<ClimateSurvey[]>(initialGroupData.climateSurveys);
   const [bscObjectives, setBscObjectives] = useState<BSCObjective[]>(initialGroupData.bscObjectives || initialBscObjectives);
   const [contracts, setContracts] = useState<ConsultingContract[]>(initialGroupData.contracts || initialContracts);
+  const [consultingPlans, setConsultingPlans] = useState<ConsultingPlan[]>((initialGroupData as any).consultingPlans || []);
   const [meetings, setMeetings] = useState<MeetingSimulation[]>(initialGroupData.meetings || initialMeetings);
   const [selectedClimateSurveyId, setSelectedClimateSurveyId] = useState<string | null>(null);
   const [reportConfig, setReportConfig] = useState<ConsultingReportConfig>(initialGroupData.reportConfig);
@@ -411,6 +423,7 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       localStorage.setItem(`${prefix}_climate`, JSON.stringify(climateSurveys));
       localStorage.setItem(`${prefix}_bsc_objectives`, JSON.stringify(bscObjectives));
       localStorage.setItem(`${prefix}_contracts`, JSON.stringify(contracts));
+      localStorage.setItem(`${prefix}_consulting_plans`, JSON.stringify(consultingPlans));
       localStorage.setItem(`${prefix}_meetings`, JSON.stringify(meetings));
       localStorage.setItem(`${prefix}_report`, JSON.stringify(reportConfig));
       localStorage.setItem(`${prefix}_settings`, JSON.stringify(settings));
@@ -434,6 +447,7 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     climateSurveys,
     bscObjectives,
     contracts,
+    consultingPlans,
     meetings,
     reportConfig,
     settings,
@@ -1856,6 +1870,106 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     showToast('Contrato removido.');
   };
 
+  // Plano de Consultoria (Modelo Oficial) CRUD & Sync
+  const currentProjectPlan = useMemo(() => {
+    if (!currentProject) return undefined;
+    const existing = consultingPlans.find((p) => p.projectId === currentProjectId);
+    if (existing) return existing;
+    
+    // Auto-generate based on live tools & project data
+    const client = clients.find((c) => c.id === currentProject.clientId || c.name === currentProject.clientName);
+    return generatePlanForProject({
+      project: currentProject,
+      client,
+      swotItems,
+      paretoItems,
+      risks,
+      climateSurveys,
+      okrs,
+      ganttTasks,
+      actions5W2H,
+      groupName: currentUser?.group || 'Grupo de Consultoria',
+      consultantDefaultName: settings.consultantDefaultName,
+    });
+  }, [
+    currentProject,
+    currentProjectId,
+    consultingPlans,
+    clients,
+    swotItems,
+    paretoItems,
+    risks,
+    climateSurveys,
+    okrs,
+    ganttTasks,
+    actions5W2H,
+    currentUser?.group,
+    settings.consultantDefaultName,
+  ]);
+
+  const saveConsultingPlan = (planData: Partial<ConsultingPlan> & { projectId: string }) => {
+    setConsultingPlans((prev) => {
+      const idx = prev.findIndex((p) => p.projectId === planData.projectId);
+      if (idx >= 0) {
+        const updated = [...prev];
+        updated[idx] = {
+          ...updated[idx],
+          ...planData,
+          updatedAt: new Date().toISOString(),
+        } as ConsultingPlan;
+        return updated;
+      } else {
+        const base = currentProjectPlan || generatePlanForProject({
+          project: currentProject || projects[0],
+          client: clients.find((c) => c.name === currentProject?.clientName),
+          groupName: currentUser?.group,
+        });
+        const fullPlan: ConsultingPlan = {
+          ...base,
+          ...planData,
+          id: `plan-${planData.projectId}-${Date.now()}`,
+          projectId: planData.projectId,
+          updatedAt: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+        } as ConsultingPlan;
+        return [fullPlan, ...prev];
+      }
+    });
+    showToast('Plano de Consultoria salvo com sucesso!');
+  };
+
+  const syncPlanWithProjectData = (projId: string): ConsultingPlan => {
+    const targetProject = projects.find((p) => p.id === projId) || currentProject;
+    if (!targetProject) throw new Error('Projeto não encontrado');
+    const client = clients.find((c) => c.id === targetProject.clientId || c.name === targetProject.clientName);
+    const freshPlan = generatePlanForProject({
+      project: targetProject,
+      client,
+      swotItems,
+      paretoItems,
+      risks,
+      climateSurveys,
+      okrs,
+      ganttTasks,
+      actions5W2H,
+      groupName: currentUser?.group || 'Grupo de Consultoria',
+      consultantDefaultName: settings.consultantDefaultName,
+    });
+
+    setConsultingPlans((prev) => {
+      const filtered = prev.filter((p) => p.projectId !== projId);
+      return [freshPlan, ...filtered];
+    });
+
+    showToast('Plano de Consultoria sincronizado com as informações atuais!');
+    return freshPlan;
+  };
+
+  const deleteConsultingPlan = (id: string) => {
+    setConsultingPlans((prev) => prev.filter((p) => p.id !== id && p.projectId !== id));
+    showToast('Plano de Consultoria redefinido para os dados das ferramentas.');
+  };
+
   // Simulador de Reunião CRUD
   const addMeeting = (meeting: Omit<MeetingSimulation, 'id' | 'projectId'>) => {
     const newMeeting: MeetingSimulation = {
@@ -2086,6 +2200,12 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         addContract,
         updateContract,
         deleteContract,
+
+        consultingPlans,
+        currentProjectPlan,
+        saveConsultingPlan,
+        syncPlanWithProjectData,
+        deleteConsultingPlan,
 
         meetings,
         addMeeting,

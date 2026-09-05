@@ -20,6 +20,7 @@ import {
   Target,
   FileSignature,
   Presentation,
+  FileText,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -80,6 +81,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           id: 'projects',
           label: 'Projetos de consultoria',
           icon: <FolderKanban className="w-4 h-4" />,
+        },
+        {
+          id: 'consultingPlan',
+          label: 'Plano de Consultoria',
+          icon: <FileText className="w-4 h-4" />,
         },
         {
           id: 'contract',
