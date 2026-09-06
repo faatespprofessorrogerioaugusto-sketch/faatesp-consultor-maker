@@ -458,7 +458,7 @@ ${formData.generalObservations}
               <div>
                 <div className="w-48 mx-auto border-b border-slate-800 mb-2" />
                 <p className="font-bold text-slate-950">{formData.consultants.split(',')[0] || 'Consultor Responsável'}</p>
-                <p className="text-slate-600">Consultor Líder &bull; {formData.groupName || 'Consultor Prime'}</p>
+                <p className="text-slate-600">Consultor Líder</p>
               </div>
               <div>
                 <div className="w-48 mx-auto border-b border-slate-800 mb-2" />
