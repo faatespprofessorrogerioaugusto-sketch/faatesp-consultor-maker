@@ -1,0 +1,39 @@
+{
+  "entities": {
+    "projects": {
+      "title": "Projects",
+      "description": "Consulting projects created by groups or professor",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "clientName": { "type": "string" },
+        "status": { "type": "string" },
+        "groupId": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      }
+    },
+    "clients": {
+      "title": "Clients",
+      "description": "Registered consulting clients",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "contactPerson": { "type": "string" },
+        "email": { "type": "string" }
+      }
+    },
+    "groupStates": {
+      "title": "Group Workspaces",
+      "description": "Collaborative state for each group (Grupo 1-5, Docente) synchronized in real-time",
+      "type": "object",
+      "properties": {
+        "groupId": { "type": "string" },
+        "data": { "type": "object" },
+        "lastUpdated": { "type": "string" },
+        "updatedBy": { "type": "string" }
+      }
+    }
+  }
+}

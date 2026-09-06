@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useRef } from 'react';
+import { db, doc, setDoc, onSnapshot, getDoc } from '../lib/firebase';
 import {
   ModuleId,
   Project,
@@ -230,6 +231,12 @@ interface ConsultingContextType {
   importDataJSON: (jsonData: string) => boolean;
   resetToDemoData: () => void;
 
+  // Real-time Cloud Collaboration (Firebase)
+  cloudSyncStatus: 'synced' | 'syncing' | 'offline' | 'error';
+  lastSyncedAt: Date | null;
+  lastCloudUser?: string;
+  forceSyncCloud: () => Promise<void>;
+
   // Auth & Group Management
   currentUser: UserSession | null;
   currentGroup: string;
@@ -279,6 +286,15 @@ export const defaultAvailableGroups = [
   'Grupo 04',
   'Grupo 05',
 ];
+
+export const getWorkspaceDocId = (groupName: string): string => {
+  return (groupName || 'grupo_01')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]/g, '_');
+};
 
 export const getGroupStoragePrefix = (groupName: string) => {
   const safe = (groupName || 'default').trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
@@ -390,6 +406,13 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   // Toasts
   const [toasts, setToasts] = useState<Toast[]>([]);
 
+  // Real-time Cloud Synchronization state (Firebase Firestore)
+  const [cloudSyncStatus, setCloudSyncStatus] = useState<'synced' | 'syncing' | 'offline' | 'error'>('synced');
+  const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(null);
+  const [lastCloudUser, setLastCloudUser] = useState<string | undefined>(undefined);
+  const isRemoteUpdateRef = useRef(false);
+  const lastLocalWriteTimeRef = useRef(0);
+
   const showToast = (message: string, type: 'success' | 'error' | 'info' | 'warning' = 'success') => {
     const id = `toast-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`;
     setToasts((prev) => [...prev, { id, type, message }]);
@@ -402,10 +425,79 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
-  // Sync to group-isolated LocalStorage
+  // 1. Subscribe to real-time updates from Firestore for the active group
+  useEffect(() => {
+    if (!currentUser?.group) return;
+    const docId = getWorkspaceDocId(currentUser.group);
+    const docRef = doc(db, 'workspaces', docId);
+
+    let isMounted = true;
+
+    const unsubscribe = onSnapshot(
+      docRef,
+      (docSnap) => {
+        if (!isMounted) return;
+
+        if (docSnap.exists()) {
+          const remoteData = docSnap.data();
+          const remoteTime = remoteData.lastUpdatedAt || 0;
+
+          // If changes occurred remotely (and not from our immediate local keystroke)
+          if (remoteTime > lastLocalWriteTimeRef.current + 150) {
+            isRemoteUpdateRef.current = true;
+
+            if (Array.isArray(remoteData.projects)) setProjects(remoteData.projects);
+            if (Array.isArray(remoteData.clients)) setClients(remoteData.clients);
+            if (Array.isArray(remoteData.swotItems)) setSwotItems(remoteData.swotItems);
+            if (Array.isArray(remoteData.ganttTasks)) setGanttTasks(remoteData.ganttTasks);
+            if (Array.isArray(remoteData.ishikawaAnalyses)) setIshikawaAnalyses(remoteData.ishikawaAnalyses);
+            if (Array.isArray(remoteData.actions5W2H)) setActions5W2H(remoteData.actions5W2H);
+            if (Array.isArray(remoteData.risks)) setRisks(remoteData.risks);
+            if (Array.isArray(remoteData.paretoItems)) setParetoItems(remoteData.paretoItems);
+            if (Array.isArray(remoteData.pestelItems)) setPestelItems(remoteData.pestelItems);
+            if (Array.isArray(remoteData.stakeholders)) setStakeholders(remoteData.stakeholders);
+            if (Array.isArray(remoteData.canvasModels)) setCanvasModels(remoteData.canvasModels);
+            if (Array.isArray(remoteData.okrs)) setOkrs(remoteData.okrs);
+            if (Array.isArray(remoteData.climateSurveys)) setClimateSurveys(remoteData.climateSurveys);
+            if (Array.isArray(remoteData.bscObjectives)) setBscObjectives(remoteData.bscObjectives);
+            if (Array.isArray(remoteData.contracts)) setContracts(remoteData.contracts);
+            if (Array.isArray(remoteData.consultingPlans)) setConsultingPlans(remoteData.consultingPlans);
+            if (Array.isArray(remoteData.meetings)) setMeetings(remoteData.meetings);
+            if (remoteData.reportConfig) setReportConfig(remoteData.reportConfig);
+            if (remoteData.settings) setSettings(remoteData.settings);
+
+            setLastSyncedAt(new Date(remoteTime));
+            if (remoteData.lastUpdatedBy && remoteData.lastUpdatedEmail !== currentUser.email) {
+              setLastCloudUser(remoteData.lastUpdatedBy);
+              showToast(`Alterações do projeto sincronizadas em tempo real por ${remoteData.lastUpdatedBy}`, 'info');
+            }
+            setCloudSyncStatus('synced');
+
+            setTimeout(() => {
+              isRemoteUpdateRef.current = false;
+            }, 300);
+          }
+        }
+      },
+      (err) => {
+        console.warn('Firestore real-time subscription status:', err);
+        setCloudSyncStatus('offline');
+      }
+    );
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
+  }, [currentUser?.group]);
+
+  // 2. Sync to LocalStorage (Immediate) & Cloud Firestore (Debounced)
   useEffect(() => {
     if (!currentUser?.group) return;
     const prefix = getGroupStoragePrefix(currentUser.group);
+    const now = Date.now();
+
+    // 2.1 LocalStorage Persistence
     try {
       localStorage.setItem(`${prefix}_initialized`, 'true');
       localStorage.setItem(`${prefix}_projects`, JSON.stringify(projects));
@@ -430,8 +522,58 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     } catch (e) {
       console.error('Failed to save to localStorage:', e);
     }
+
+    // 2.2 Cloud Firestore Syncing
+    if (isRemoteUpdateRef.current) return;
+
+    setCloudSyncStatus('syncing');
+    const timer = setTimeout(async () => {
+      try {
+        const docId = getWorkspaceDocId(currentUser.group);
+        const docRef = doc(db, 'workspaces', docId);
+        lastLocalWriteTimeRef.current = now;
+
+        const payload = JSON.parse(JSON.stringify({
+          groupName: currentUser.group,
+          lastUpdatedAt: now,
+          lastUpdatedISO: new Date(now).toISOString(),
+          lastUpdatedBy: currentUser.name || currentUser.email,
+          lastUpdatedEmail: currentUser.email,
+          projects,
+          clients,
+          swotItems,
+          ganttTasks,
+          ishikawaAnalyses,
+          actions5W2H,
+          risks,
+          paretoItems,
+          pestelItems,
+          stakeholders,
+          canvasModels,
+          okrs,
+          climateSurveys,
+          bscObjectives,
+          contracts,
+          consultingPlans,
+          meetings,
+          reportConfig,
+          settings,
+        }));
+
+        await setDoc(docRef, payload, { merge: true });
+        setCloudSyncStatus('synced');
+        setLastSyncedAt(new Date(now));
+      } catch (err) {
+        console.error('Failed to sync to Firestore:', err);
+        setCloudSyncStatus('offline');
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
   }, [
     currentUser?.group,
+    currentUser?.name,
+    currentUser?.email,
     projects,
     clients,
     swotItems,
@@ -452,6 +594,54 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     reportConfig,
     settings,
   ]);
+
+  // Manual Force Sync with Cloud
+  const forceSyncCloud = async () => {
+    if (!currentUser?.group) return;
+    setCloudSyncStatus('syncing');
+    try {
+      const docId = getWorkspaceDocId(currentUser.group);
+      const docRef = doc(db, 'workspaces', docId);
+      const now = Date.now();
+      lastLocalWriteTimeRef.current = now;
+
+      const payload = JSON.parse(JSON.stringify({
+        groupName: currentUser.group,
+        lastUpdatedAt: now,
+        lastUpdatedISO: new Date(now).toISOString(),
+        lastUpdatedBy: currentUser.name || currentUser.email,
+        lastUpdatedEmail: currentUser.email,
+        projects,
+        clients,
+        swotItems,
+        ganttTasks,
+        ishikawaAnalyses,
+        actions5W2H,
+        risks,
+        paretoItems,
+        pestelItems,
+        stakeholders,
+        canvasModels,
+        okrs,
+        climateSurveys,
+        bscObjectives,
+        contracts,
+        consultingPlans,
+        meetings,
+        reportConfig,
+        settings,
+      }));
+
+      await setDoc(docRef, payload, { merge: true });
+      setCloudSyncStatus('synced');
+      setLastSyncedAt(new Date(now));
+      showToast('Sincronização em nuvem concluída com sucesso!', 'success');
+    } catch (err) {
+      console.error('Force sync failed:', err);
+      setCloudSyncStatus('error');
+      showToast('Erro ao sincronizar com o banco em nuvem.', 'error');
+    }
+  };
 
   // Auth & Group Actions
   const login = (email: string, group: string) => {
@@ -2226,6 +2416,12 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         exportAllDataJSON,
         importDataJSON,
         resetToDemoData,
+
+        // Real-time Cloud Collaboration (Firebase)
+        cloudSyncStatus,
+        lastSyncedAt,
+        lastCloudUser,
+        forceSyncCloud,
 
         // Auth & Group Management
         currentUser,

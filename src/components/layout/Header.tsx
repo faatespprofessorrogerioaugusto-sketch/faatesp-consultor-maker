@@ -27,6 +27,9 @@ import {
   Trash2,
   Lock,
   GraduationCap,
+  Cloud,
+  CloudOff,
+  Radio,
 } from 'lucide-react';
 import { GlobalSearchModal } from '../common/GlobalSearchModal';
 import { StatusBadge } from '../common/Badge';
@@ -50,6 +53,10 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileSidebar }) => {
     switchGroup,
     logout,
     cleanCurrentGroupData,
+    cloudSyncStatus,
+    lastSyncedAt,
+    lastCloudUser,
+    forceSyncCloud,
   } = useConsulting();
 
   const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
@@ -189,6 +196,45 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileSidebar }) => {
             <kbd className="hidden md:inline-block px-1.5 py-0.5 text-[10px] text-slate-300 bg-slate-700 rounded border border-slate-600 font-mono">
               /
             </kbd>
+          </button>
+
+          {/* Cloud Real-Time Collaboration Badge */}
+          <button
+            id="header-cloud-sync-status-btn"
+            onClick={() => forceSyncCloud()}
+            className={`hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs transition-all cursor-pointer shadow-sm ${
+              cloudSyncStatus === 'synced'
+                ? 'border-emerald-500/30 bg-emerald-950/40 text-emerald-300 hover:bg-emerald-900/50'
+                : cloudSyncStatus === 'syncing'
+                ? 'border-cyan-500/30 bg-cyan-950/40 text-cyan-300 hover:bg-cyan-900/50'
+                : 'border-amber-500/30 bg-amber-950/40 text-amber-300 hover:bg-amber-900/50'
+            }`}
+            title={
+              cloudSyncStatus === 'synced'
+                ? `Nuvem sincronizada em tempo real com ${currentGroup}. Clique para forçar sincronização manual.`
+                : cloudSyncStatus === 'syncing'
+                ? 'Sincronizando dados com o Firestore...'
+                : 'Trabalhando offline / reconectando ao Firebase. Clique para tentar sincronizar.'
+            }
+          >
+            {cloudSyncStatus === 'syncing' ? (
+              <RefreshCw className="w-3.5 h-3.5 text-cyan-400 animate-spin" />
+            ) : cloudSyncStatus === 'synced' ? (
+              <div className="relative flex items-center justify-center">
+                <Cloud className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse ring-1 ring-slate-900" />
+              </div>
+            ) : (
+              <CloudOff className="w-3.5 h-3.5 text-amber-400" />
+            )}
+            <div className="text-left leading-none">
+              <span className="text-[9px] uppercase font-bold tracking-wider block opacity-75">
+                {cloudSyncStatus === 'synced' ? 'Nuvem Ativa' : cloudSyncStatus === 'syncing' ? 'Salvando...' : 'Nuvem'}
+              </span>
+              <span className="text-[11px] font-semibold block mt-0.5">
+                {cloudSyncStatus === 'synced' ? 'Em Tempo Real' : cloudSyncStatus === 'syncing' ? 'Sincronizando' : 'Offline'}
+              </span>
+            </div>
           </button>
 
           {/* Active Group Notification Badge (Right next to search bar) */}
