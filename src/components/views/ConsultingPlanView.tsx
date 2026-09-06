@@ -293,9 +293,6 @@ ${formData.generalObservations}
               <h2 className="text-base sm:text-lg font-bold font-sans text-slate-900">
                 2. DESCRIÇÃO DO PROBLEMA OU OPORTUNIDADE
               </h2>
-              <p className="text-xs italic text-slate-600 font-sans leading-normal">
-                Descreva, de forma objetiva, a situação que motivou a busca pela consultoria. O que a empresa está enfrentando? Como esse problema foi percebido?
-              </p>
               <div className="text-sm text-slate-800 font-sans text-justify space-y-2 leading-relaxed">
                 <p>{formData.problemDescription}</p>
                 {formData.problemPerceptionContext && (
@@ -322,9 +319,6 @@ ${formData.generalObservations}
               <h2 className="text-base sm:text-lg font-bold font-sans text-slate-900">
                 3. OBJETIVOS DO TRABALHO
               </h2>
-              <p className="text-xs italic text-slate-600 font-sans leading-normal">
-                Liste os resultados específicos que se pretende alcançar com a consultoria. Procure objetivos claros e, se possível, mensuráveis.
-              </p>
               <div className="text-sm text-slate-800 font-sans space-y-2 pl-2">
                 {formData.objectives.map((obj, idx) => (
                   <div key={idx} className="flex items-start gap-2">
@@ -341,9 +335,6 @@ ${formData.generalObservations}
               <h2 className="text-base sm:text-lg font-bold font-sans text-slate-900">
                 4. METODOLOGIAS E FERRAMENTAS
               </h2>
-              <p className="text-xs italic text-slate-600 font-sans leading-normal">
-                Indique quais ferramentas de diagnóstico e quais técnicas de coleta de dados serão utilizadas ao longo do trabalho (ex.: entrevistas, questionários, observação direta, análise SWOT, OKR, benchmarking).
-              </p>
               <div className="text-sm text-slate-800 font-sans text-justify space-y-3 whitespace-pre-line leading-relaxed">
                 {formData.methodologiesAndTools}
               </div>
@@ -365,9 +356,6 @@ ${formData.generalObservations}
               <h2 className="text-base sm:text-lg font-bold font-sans text-slate-900">
                 5. CRONOGRAMA DAS FASES DO PROCESSO
               </h2>
-              <p className="text-xs italic text-slate-600 font-sans leading-normal">
-                Preencha, para cada fase do processo de consultoria, a descrição das atividades previstas, o prazo estimado e o responsável.
-              </p>
               
               {/* Process Phases Table */}
               <div className="overflow-x-auto rounded-lg border border-slate-400 mt-3 print:border-black">
@@ -416,9 +404,6 @@ ${formData.generalObservations}
               <h2 className="text-base sm:text-lg font-bold font-sans text-slate-900">
                 6. RECURSOS NECESSÁRIOS
               </h2>
-              <p className="text-xs italic text-slate-600 font-sans leading-normal">
-                Liste os recursos humanos, materiais ou de acesso a informações necessários para a realização do trabalho.
-              </p>
               <div className="text-sm font-sans space-y-3 text-slate-800 pl-2">
                 <div>
                   <strong className="font-semibold text-slate-950">• Recursos humanos:</strong>
@@ -447,9 +432,6 @@ ${formData.generalObservations}
               <h2 className="text-base sm:text-lg font-bold font-sans text-slate-900">
                 7. INDICADORES DE SUCESSO
               </h2>
-              <p className="text-xs italic text-slate-600 font-sans leading-normal">
-                Defina como será avaliado, ao final do trabalho, se os objetivos foram alcançados.
-              </p>
               <div className="text-sm text-slate-800 font-sans space-y-2 pl-2">
                 {formData.successIndicators.map((ind, idx) => (
                   <div key={idx} className="flex items-start gap-2">
