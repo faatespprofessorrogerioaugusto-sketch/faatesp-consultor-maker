@@ -227,6 +227,7 @@ interface ConsultingContextType {
   removeToast: (id: string) => void;
   formatCurrency: (val?: number) => string;
   calculateRiskClass: (score: number) => RiskClassification;
+  calculateRiskClassification?: (score: number) => RiskClassification;
   exportAllDataJSON: () => void;
   importDataJSON: (jsonData: string) => boolean;
   resetToDemoData: () => void;
@@ -2413,6 +2414,7 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         removeToast,
         formatCurrency,
         calculateRiskClass,
+        calculateRiskClassification: calculateRiskClass,
         exportAllDataJSON,
         importDataJSON,
         resetToDemoData,

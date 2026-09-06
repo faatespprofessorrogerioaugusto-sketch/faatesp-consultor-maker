@@ -100,12 +100,12 @@ const RISK_PRESETS: RiskPreset[] = [
 export const RiskMatrixView: React.FC = () => {
   const {
     currentProject,
-    currentProjectRisks,
+    currentProjectRisks = [],
     addRisk,
     updateRisk,
     duplicateRisk,
     deleteRisk,
-    calculateRiskClassification,
+    calculateRiskClass,
     settings,
     currentUser,
   } = useConsulting();
@@ -163,6 +163,23 @@ export const RiskMatrixView: React.FC = () => {
     return <div className="p-8 text-center bg-slate-900 border border-slate-800 rounded-xl text-slate-400">Selecione um projeto primeiro.</div>;
   }
 
+  // Safe thresholds
+  const thresholds = settings?.riskScoreThresholds || settings?.riskThresholds || {
+    critical: 16,
+    high: 12,
+    moderate: 6,
+  };
+
+  const computeRiskClassification = (score: number): RiskClassification => {
+    if (typeof calculateRiskClass === 'function') {
+      return calculateRiskClass(score);
+    }
+    if (score >= (thresholds.critical ?? 16)) return 'Crítico';
+    if (score >= (thresholds.high ?? 12)) return 'Alto';
+    if (score >= (thresholds.moderate ?? 6)) return 'Moderado';
+    return 'Baixo';
+  };
+
   const categories: RiskCategory[] = [
     'Estratégico',
     'Operacional',
@@ -175,7 +192,7 @@ export const RiskMatrixView: React.FC = () => {
 
   const getCellColor = (p: number, i: number) => {
     const score = p * i;
-    const { critical, high, moderate } = settings.riskScoreThresholds;
+    const { critical = 16, high = 12, moderate = 6 } = thresholds;
     if (score >= critical) return 'bg-rose-600 text-white hover:bg-rose-500';
     if (score >= high) return 'bg-amber-600 text-white hover:bg-amber-500';
     if (score >= moderate) return 'bg-blue-600 text-white hover:bg-blue-500';
@@ -183,7 +200,7 @@ export const RiskMatrixView: React.FC = () => {
   };
 
   const getScoreColorClass = (score: number) => {
-    const { critical, high, moderate } = settings.riskScoreThresholds;
+    const { critical = 16, high = 12, moderate = 6 } = thresholds;
     if (score >= critical) return 'text-rose-400 bg-rose-950/50 border-rose-800';
     if (score >= high) return 'text-amber-400 bg-amber-950/50 border-amber-800';
     if (score >= moderate) return 'text-blue-400 bg-blue-950/50 border-blue-800';
@@ -234,7 +251,7 @@ export const RiskMatrixView: React.FC = () => {
       responsible: r.responsible || currentProject.leadConsultant || 'Consultor Responsável',
       preventiveAction: r.preventiveAction,
       contingencyPlan: r.contingencyPlan,
-      reviewDate: r.reviewDate,
+      reviewDate: r.reviewDate || new Date().toISOString().split('T')[0],
       status: r.status,
     });
     setIsModalOpen(true);
@@ -245,7 +262,7 @@ export const RiskMatrixView: React.FC = () => {
     if (!formData.risk.trim()) return;
 
     const score = formData.probability * formData.impact;
-    const classification = calculateRiskClassification(score);
+    const classification = computeRiskClassification(score);
 
     if (editingRisk) {
       updateRisk(editingRisk.id, {
@@ -265,15 +282,12 @@ export const RiskMatrixView: React.FC = () => {
       });
     } else {
       addRisk({
-        projectId: currentProject.id,
         risk: formData.risk,
         cause: formData.cause,
         consequence: formData.consequence,
         category: formData.category,
         probability: formData.probability,
         impact: formData.impact,
-        riskScore: score,
-        classification: classification,
         responsible: formData.responsible || currentProject.leadConsultant || 'Consultor Responsável',
         preventiveAction: formData.preventiveAction,
         contingencyPlan: formData.contingencyPlan,
@@ -284,7 +298,7 @@ export const RiskMatrixView: React.FC = () => {
     setIsModalOpen(false);
   };
 
-  const filteredRisks = currentProjectRisks.filter((r) => {
+  const filteredRisks = (currentProjectRisks || []).filter((r) => {
     const matchClass =
       classificationFilter === 'all' || r.classification === classificationFilter;
     const matchCat = categoryFilter === 'all' || r.category === categoryFilter;
@@ -313,7 +327,7 @@ export const RiskMatrixView: React.FC = () => {
   ];
 
   const currentScore = formData.probability * formData.impact;
-  const currentClassification = calculateRiskClassification(currentScore);
+  const currentClassification = computeRiskClassification(currentScore);
 
   return (
     <div className="space-y-6 text-slate-100">

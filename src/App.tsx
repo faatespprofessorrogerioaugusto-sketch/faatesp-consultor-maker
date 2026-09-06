@@ -22,6 +22,7 @@ import { ParetoView } from './components/views/ParetoView';
 import { ClimateSurveyView } from './components/views/ClimateSurveyView';
 import { ReportsView } from './components/views/ReportsView';
 import { SettingsView } from './components/views/SettingsView';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 
 const MainContent: React.FC = () => {
   const { activeModule, currentUser } = useConsulting();
@@ -91,7 +92,9 @@ const MainContent: React.FC = () => {
       >
         <Header onToggleMobileSidebar={() => setIsMobileSidebarOpen((prev) => !prev)} />
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
-          {renderActiveView()}
+          <ErrorBoundary fallbackTitle="Erro ao carregar o módulo">
+            {renderActiveView()}
+          </ErrorBoundary>
         </main>
         <footer className="py-5 px-6 border-t border-slate-800/80 text-center text-xs text-slate-400 bg-slate-950/60 mt-auto">
           <strong className="font-bold text-slate-200">Todos os direitos reservados &bull; MISTER ROGER</strong>
