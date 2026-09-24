@@ -20,6 +20,7 @@ import {
   DollarSign,
   Calendar,
   User,
+  FileText,
 } from 'lucide-react';
 
 export const Action5W2HView: React.FC = () => {
@@ -267,6 +268,14 @@ export const Action5W2HView: React.FC = () => {
         subtitle="Quadro de execução tática: O que, Por que, Onde, Quando, Quem, Como e Quanto Custa"
         actions={
           <>
+            <button
+              onClick={() => setActiveModule('reports')}
+              className="px-3 py-2 text-xs font-semibold text-blue-300 bg-blue-950/60 border border-blue-800/80 rounded-lg hover:bg-blue-900/80 hover:text-white transition-colors flex items-center gap-1.5 shadow-sm cursor-pointer"
+              title="Gerar Dossiê Executivo em PDF e Word (DOCX)"
+            >
+              <FileText className="w-4 h-4 text-blue-400" />
+              <span>Dossiê (PDF / DOCX)</span>
+            </button>
             <button
               onClick={exportCSV}
               className="px-3 py-2 text-xs font-semibold text-slate-300 bg-slate-800 border border-slate-700 rounded-lg hover:bg-slate-700 hover:text-white transition-colors flex items-center gap-1.5 shadow-sm cursor-pointer"

@@ -1,33 +1,29 @@
 import React, { useState, useMemo } from 'react';
 import { useConsulting } from '../../context/ConsultingContext';
 import { Breadcrumbs } from '../layout/Breadcrumbs';
+import { generateConsultingDocx } from '../../utils/docxExport';
 import {
   FileSpreadsheet,
   Printer,
   Download,
   Copy,
-  CheckCircle2,
-  Building2,
   Calendar,
-  Layers,
-  Award,
   CheckSquare,
   Sparkles,
   ShieldAlert,
   BarChart3,
-  Users2,
   FileSignature,
   Presentation,
   Target,
   Grid2X2,
   GitPullRequest,
   HeartHandshake,
-  DollarSign,
-  AlertTriangle,
-  Clock,
-  Briefcase,
   Check,
   Compass,
+  FileText,
+  FileDown,
+  Loader2,
+  FileCode,
 } from 'lucide-react';
 
 export const ReportsView: React.FC = () => {
@@ -63,11 +59,15 @@ export const ReportsView: React.FC = () => {
   // Derived SWOT categories
   const swotGrouped = useMemo(() => {
     const list = Array.isArray(currentProjectSwot) ? currentProjectSwot : [];
+    const isCategory = (item: any, cat: string) => {
+      const c = (item.category || item.type || '').toLowerCase();
+      return c.includes(cat);
+    };
     return {
-      strengths: list.filter((i) => i.type === 'strength'),
-      weaknesses: list.filter((i) => i.type === 'weakness'),
-      opportunities: list.filter((i) => i.type === 'opportunity'),
-      threats: list.filter((i) => i.type === 'threat'),
+      strengths: list.filter((i) => isCategory(i, 'for') || isCategory(i, 'streng')),
+      weaknesses: list.filter((i) => isCategory(i, 'fra') || isCategory(i, 'weak')),
+      opportunities: list.filter((i) => isCategory(i, 'opor') || isCategory(i, 'oppor')),
+      threats: list.filter((i) => isCategory(i, 'ame') || isCategory(i, 'threa')),
     };
   }, [currentProjectSwot]);
 
@@ -126,9 +126,69 @@ export const ReportsView: React.FC = () => {
   );
 
   const [copiedSummary, setCopiedSummary] = useState(false);
+  const [isExportingDocx, setIsExportingDocx] = useState(false);
 
+  // Impressão / Exportação PDF
   const handlePrint = () => {
-    window.print();
+    if (!currentProject) {
+      showToast('Selecione um projeto para gerar o relatório em PDF.', 'warning');
+      return;
+    }
+    showToast('Preparando impressão. Escolha "Salvar como PDF" no destino da impressora para gerar o arquivo.', 'info');
+    setTimeout(() => {
+      window.print();
+    }, 250);
+  };
+
+  // Exportação DOCX via docx
+  const handleExportDOCX = async () => {
+    if (!currentProject) {
+      showToast('Selecione um projeto para exportar o relatório.', 'warning');
+      return;
+    }
+
+    try {
+      setIsExportingDocx(true);
+      showToast('Compilando relatório executivo em formato Word (.docx)...', 'info');
+
+      const blob = await generateConsultingDocx({
+        project: currentProject,
+        client: currentProjectClient,
+        contract: projectContract,
+        meetings: projectMeetings,
+        bscObjectives: projectBscObjectives,
+        okrs: projectOkrs,
+        swotItems: currentProjectSwot || [],
+        ishikawas: projectIshikawas,
+        actions5w2h: currentProjectActions,
+        ganttTasks: currentProjectTasks,
+        risks: currentProjectRisks,
+        pareto: currentProjectPareto,
+        climateSurveys: currentProjectClimateSurveys,
+        consultantNotes,
+        recommendations,
+        settings,
+        includedModules,
+        formatCurrency,
+      });
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const sanitizedName = currentProject.name.replace(/[^a-zA-Z0-9À-ÿ_-]/g, '_');
+      link.download = `Relatorio_Executivo_${sanitizedName}_${new Date().toISOString().split('T')[0]}.docx`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+
+      showToast('Relatório DOCX (Word) gerado e baixado com sucesso!', 'success');
+    } catch (error) {
+      console.error('Erro ao gerar DOCX:', error);
+      showToast('Ocorreu um erro ao gerar o arquivo Word. Tente novamente.', 'error');
+    } finally {
+      setIsExportingDocx(false);
+    }
   };
 
   const handleExportJSON = () => {
@@ -143,6 +203,7 @@ export const ReportsView: React.FC = () => {
       contract: projectContract,
       meetings: projectMeetings,
       okrs: projectOkrs,
+      bsc: projectBscObjectives,
       swot: swotGrouped,
       gantt: currentProjectTasks,
       ishikawa: projectIshikawas,
@@ -195,10 +256,10 @@ export const ReportsView: React.FC = () => {
     // SWOT
     csvContent += `\n--- MATRIZ SWOT ---\n`;
     csvContent += `Tipo;Descricao;Impacto\n`;
-    swotGrouped.strengths.forEach((s) => csvContent += `"Forca";"${s.text}";"${s.impact || 'Alto'}"\n`);
-    swotGrouped.weaknesses.forEach((w) => csvContent += `"Fraqueza";"${w.text}";"${w.impact || 'Alto'}"\n`);
-    swotGrouped.opportunities.forEach((o) => csvContent += `"Oportunidade";"${o.text}";"${o.impact || 'Alto'}"\n`);
-    swotGrouped.threats.forEach((t) => csvContent += `"Ameaca";"${t.text}";"${t.impact || 'Alto'}"\n`);
+    swotGrouped.strengths.forEach((s) => csvContent += `"Forca";"${s.factor || (s as any).text || ''}";"${s.impact || 3}"\n`);
+    swotGrouped.weaknesses.forEach((w) => csvContent += `"Fraqueza";"${w.factor || (w as any).text || ''}";"${w.impact || 3}"\n`);
+    swotGrouped.opportunities.forEach((o) => csvContent += `"Oportunidade";"${o.factor || (o as any).text || ''}";"${o.impact || 3}"\n`);
+    swotGrouped.threats.forEach((t) => csvContent += `"Ameaca";"${t.factor || (t as any).text || ''}";"${t.impact || 3}"\n`);
 
     // Risks
     csvContent += `\n--- MATRIZ DE RISCOS ---\n`;
@@ -251,6 +312,7 @@ ${recommendations}
 *INDICADORES GERAIS:*
 • Ações 5W2H Mapeadas: ${currentProjectActions.length} (${currentProjectActions.filter((a) => a.status === 'Concluída').length} concluídas)
 • Riscos Identificados: ${currentProjectRisks.length} (${currentProjectRisks.filter((r) => r.classification === 'Crítico' || r.classification === 'Alto').length} de alta prioridade)
+• Metas BSC: ${projectBscObjectives.length} objetivos estratégicos
 • Objetivos Estratégicos (OKRs): ${projectOkrs.length} (${projectOkrs.reduce((acc, o) => acc + o.keyResults.length, 0)} KRs)
 • Itens SWOT: ${currentProjectSwot.length}
 • Pesquisas de Clima: ${currentProjectClimateSurveys.length}`;
@@ -267,7 +329,7 @@ ${recommendations}
       <div className="space-y-6 text-slate-100">
         <Breadcrumbs
           title="Relatórios & Dossiê Executivo"
-          subtitle="Geração de relatórios gerenciais, exportação de dados e impressão em PDF"
+          subtitle="Geração de relatórios gerenciais, exportação em Word (DOCX), impressão em PDF e dados estruturados"
         />
         <div className="p-12 text-center bg-slate-900 border border-slate-800 rounded-2xl">
           <FileSpreadsheet className="w-12 h-12 text-slate-600 mx-auto mb-3" />
@@ -280,7 +342,7 @@ ${recommendations}
               <select
                 value={currentProjectId}
                 onChange={(e) => setCurrentProjectId(e.target.value)}
-                className="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg px-3 py-2"
+                className="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg px-3 py-2 cursor-pointer"
               >
                 {projects.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -300,8 +362,8 @@ ${recommendations}
       {/* Top Header - Hidden when printing */}
       <div className="print:hidden">
         <Breadcrumbs
-          title="Relatório Executivo de Consultoria & Exportação"
-          subtitle="Geração de dossiê profissional para o cliente, impressão em PDF, planilha CSV e backup estruturado"
+          title="Relatório Executivo & Centro de Exportação"
+          subtitle="Geração de dossiê profissional para o cliente, exportação nativa em DOCX (Word), impressão vetorial em PDF e planilhas"
           actions={
             <div className="flex items-center gap-2 flex-wrap">
               <button
@@ -324,64 +386,153 @@ ${recommendations}
               </button>
 
               <button
-                id="btn-export-csv"
-                onClick={handleExportCSV}
-                className="px-3 py-1.5 text-xs font-semibold text-slate-200 bg-slate-800 border border-slate-700 rounded-lg hover:bg-slate-750 transition-colors flex items-center gap-1.5 shadow-sm cursor-pointer"
-                title="Exportar dados em formato CSV para Excel"
+                id="btn-export-docx"
+                onClick={handleExportDOCX}
+                disabled={isExportingDocx}
+                className="px-3 py-1.5 text-xs font-semibold text-blue-100 bg-blue-700/80 border border-blue-600 rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-1.5 shadow-sm cursor-pointer disabled:opacity-50"
+                title="Exportar documento no formato Microsoft Word (.docx)"
               >
-                <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Exportar Planilha (CSV)</span>
-              </button>
-
-              <button
-                id="btn-export-json"
-                onClick={handleExportJSON}
-                className="px-3 py-1.5 text-xs font-semibold text-slate-200 bg-slate-800 border border-slate-700 rounded-lg hover:bg-slate-750 transition-colors flex items-center gap-1.5 shadow-sm cursor-pointer"
-                title="Exportar backup completo em JSON"
-              >
-                <Download className="w-3.5 h-3.5 text-blue-400" />
-                <span>Exportar JSON</span>
+                {isExportingDocx ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Gerando Word...</span>
+                  </>
+                ) : (
+                  <>
+                    <FileText className="w-3.5 h-3.5 text-blue-300" />
+                    <span>Exportar DOCX (Word)</span>
+                  </>
+                )}
               </button>
 
               <button
                 id="btn-print-report"
                 onClick={handlePrint}
                 className="px-3.5 py-1.5 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors flex items-center gap-1.5 shadow-sm cursor-pointer"
-                title="Imprimir ou Salvar PDF"
+                title="Imprimir ou Salvar em PDF de alta qualidade"
               >
                 <Printer className="w-3.5 h-3.5" />
-                <span>Imprimir / Salvar PDF</span>
+                <span>Exportar PDF / Imprimir</span>
               </button>
             </div>
           }
         />
       </div>
 
-      {/* Module Selector & Notes Customizer (Hidden during Print) */}
-      <div className="bg-slate-900 p-5 rounded-xl border border-slate-800 shadow-sm space-y-4 print:hidden">
+      {/* QUICK EXPORT CHANNELS CARD (Hidden during Print) */}
+      <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-md space-y-4 print:hidden">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
           <div>
-            <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">
-              Painel de Configuração do Dossiê do Cliente
+            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+              <FileDown className="w-4 h-4 text-blue-400" />
+              <span>Formatos de Exportação Direta</span>
             </h3>
-            <p className="text-[11px] text-slate-400 mt-0.5">
-              Selecione quais módulos devem ser incluídos na visualização e impressão do relatório.
+            <p className="text-xs text-slate-400 mt-0.5">
+              Escolha o formato ideal para apresentação executiva, edição no Microsoft Word ou análise em planilhas:
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-400">Projeto Ativo:</span>
+          <div className="flex items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700">
+            <span className="text-xs text-slate-400 font-medium">Projeto:</span>
             <select
               value={currentProjectId}
               onChange={(e) => setCurrentProjectId(e.target.value)}
-              className="text-xs bg-slate-800 border border-slate-700 text-slate-200 font-semibold rounded-lg px-2.5 py-1 focus:ring-1 focus:ring-blue-500"
+              className="text-xs bg-transparent border-none text-slate-100 font-bold focus:ring-0 cursor-pointer outline-none"
             >
               {projects.map((p) => (
-                <option key={p.id} value={p.id}>
+                <option key={p.id} value={p.id} className="bg-slate-800 text-white">
                   {p.name} ({p.clientName})
                 </option>
               ))}
             </select>
           </div>
+        </div>
+
+        {/* Action format cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {/* 1. PDF */}
+          <button
+            onClick={handlePrint}
+            className="text-left p-3.5 bg-slate-800/60 hover:bg-slate-800 border border-slate-700/80 hover:border-blue-500 rounded-xl transition-all group cursor-pointer"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-xs">
+                PDF
+              </div>
+              <Printer className="w-4 h-4 text-slate-400 group-hover:text-rose-400 transition-colors" />
+            </div>
+            <h4 className="text-xs font-bold text-white group-hover:text-rose-300">Documento PDF</h4>
+            <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+              Diagramação executiva A4, cabeçalhos formais e assinatura (via impressão / salvar como PDF).
+            </p>
+          </button>
+
+          {/* 2. DOCX */}
+          <button
+            onClick={handleExportDOCX}
+            disabled={isExportingDocx}
+            className="text-left p-3.5 bg-slate-800/60 hover:bg-slate-800 border border-slate-700/80 hover:border-blue-500 rounded-xl transition-all group cursor-pointer disabled:opacity-50"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xs">
+                DOCX
+              </div>
+              {isExportingDocx ? (
+                <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
+              ) : (
+                <FileText className="w-4 h-4 text-slate-400 group-hover:text-blue-400 transition-colors" />
+              )}
+            </div>
+            <h4 className="text-xs font-bold text-white group-hover:text-blue-300">Microsoft Word (.docx)</h4>
+            <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+              Arquivo nativo do Word totalmente editável com tabelas estruturadas, estilos corporativos e capas.
+            </p>
+          </button>
+
+          {/* 3. CSV */}
+          <button
+            onClick={handleExportCSV}
+            className="text-left p-3.5 bg-slate-800/60 hover:bg-slate-800 border border-slate-700/80 hover:border-emerald-500 rounded-xl transition-all group cursor-pointer"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
+                CSV
+              </div>
+              <FileSpreadsheet className="w-4 h-4 text-slate-400 group-hover:text-emerald-400 transition-colors" />
+            </div>
+            <h4 className="text-xs font-bold text-white group-hover:text-emerald-300">Planilha Excel (CSV)</h4>
+            <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+              Tabelas tabuladas com 5W2H, Riscos, SWOT e OKRs prontas para importação no Excel ou PowerBI.
+            </p>
+          </button>
+
+          {/* 4. JSON */}
+          <button
+            onClick={handleExportJSON}
+            className="text-left p-3.5 bg-slate-800/60 hover:bg-slate-800 border border-slate-700/80 hover:border-purple-500 rounded-xl transition-all group cursor-pointer"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-xs">
+                JSON
+              </div>
+              <FileCode className="w-4 h-4 text-slate-400 group-hover:text-purple-400 transition-colors" />
+            </div>
+            <h4 className="text-xs font-bold text-white group-hover:text-purple-300">Backup Técnico (JSON)</h4>
+            <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+              Exportação do banco de dados completo do projeto para integração ou restauração técnica.
+            </p>
+          </button>
+        </div>
+      </div>
+
+      {/* Module Selector & Notes Customizer (Hidden during Print) */}
+      <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-sm space-y-4 print:hidden">
+        <div>
+          <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">
+            Personalização do Dossiê Executivo
+          </h3>
+          <p className="text-[11px] text-slate-400 mt-0.5">
+            Selecione quais seções deseja incluir tanto na visualização em tela, no documento Word (.docx) e na impressão em PDF:
+          </p>
         </div>
 
         {/* Modules Checkboxes */}
@@ -448,7 +599,7 @@ ${recommendations}
       </div>
 
       {/* PRINTABLE EXECUTIVE REPORT PREVIEW CONTAINER */}
-      <div className="bg-slate-900 p-6 sm:p-10 rounded-xl border border-slate-800 shadow-xl text-slate-100 max-w-5xl mx-auto print:bg-white print:text-slate-900 print:border-none print:shadow-none print:p-0 print:m-0 print:max-w-full">
+      <div className="bg-slate-900 p-6 sm:p-10 rounded-2xl border border-slate-800 shadow-xl text-slate-100 max-w-5xl mx-auto print:bg-white print:text-slate-900 print:border-none print:shadow-none print:p-0 print:m-0 print:max-w-full">
         {/* Formal Header */}
         <div className="border-b-2 border-slate-800 pb-6 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:border-slate-900">
           <div>
@@ -562,7 +713,7 @@ ${recommendations}
           <div className="mb-8 space-y-3">
             <h2 className="text-sm font-black text-slate-100 uppercase tracking-wider border-b border-slate-800 pb-1 print:text-slate-900 print:border-slate-300 flex items-center gap-1.5">
               <Presentation className="w-4 h-4 text-blue-400 print:text-slate-800" />
-              3. Alinhamento com Stakeholders & Reuniões Simuladas ({projectMeetings.length})
+              3. Alinhamento com Stakeholders & Reuniões ({projectMeetings.length})
             </h2>
             <div className="space-y-2 text-xs">
               {projectMeetings.map((m) => (
@@ -572,14 +723,19 @@ ${recommendations}
                 >
                   <div className="flex items-center justify-between font-bold text-slate-100 print:text-slate-900">
                     <span>{m.title}</span>
-                    <span className="text-slate-400 print:text-slate-600 font-normal">{m.date} • {m.durationMinutes} min</span>
+                    <span className="text-slate-400 print:text-slate-600 font-normal">
+                      {m.scheduledDate || (m as any).date || 'Data não definida'} • {m.durationMinutes} min
+                    </span>
                   </div>
                   <p className="text-slate-300 print:text-slate-700">
-                    <strong>Pauta:</strong> {m.agenda}
+                    <strong>Pauta:</strong>{' '}
+                    {Array.isArray(m.agenda)
+                      ? m.agenda.map((a: any) => a.title || a).join(', ')
+                      : String(m.agenda || 'Alinhamento geral')}
                   </p>
-                  {m.clientFeedback && (
+                  {(m.meetingNotes || (m as any).clientFeedback) && (
                     <p className="text-slate-400 print:text-slate-600 italic">
-                      "Feedback: {m.clientFeedback}"
+                      "Notas: {m.meetingNotes || (m as any).clientFeedback}"
                     </p>
                   )}
                 </div>
@@ -663,7 +819,7 @@ ${recommendations}
           <div className="mb-8 space-y-3">
             <h2 className="text-sm font-black text-slate-100 uppercase tracking-wider border-b border-slate-800 pb-1 print:text-slate-900 print:border-slate-300 flex items-center gap-1.5">
               <Target className="w-4 h-4 text-blue-400 print:text-slate-800" />
-              Objetivos e Resultados-Chave (OKRs & Metas) — Desdobramento Estratégico ({projectOkrs.length})
+              Objetivos e Resultados-Chave (OKRs) — Desdobramento Estratégico ({projectOkrs.length})
             </h2>
             <div className="space-y-4 text-xs">
               {projectOkrs.map((obj) => (
@@ -741,7 +897,7 @@ ${recommendations}
                 </p>
                 <ul className="list-disc list-inside space-y-0.5 text-slate-300 print:text-slate-700">
                   {swotGrouped.strengths.map((s) => (
-                    <li key={s.id}>{s.text}</li>
+                    <li key={s.id}>{s.factor || (s as any).text || s.description || 'Força identificada'}</li>
                   ))}
                 </ul>
               </div>
@@ -751,7 +907,7 @@ ${recommendations}
                 </p>
                 <ul className="list-disc list-inside space-y-0.5 text-slate-300 print:text-slate-700">
                   {swotGrouped.weaknesses.map((s) => (
-                    <li key={s.id}>{s.text}</li>
+                    <li key={s.id}>{s.factor || (s as any).text || s.description || 'Fraqueza identificada'}</li>
                   ))}
                 </ul>
               </div>
@@ -761,7 +917,7 @@ ${recommendations}
                 </p>
                 <ul className="list-disc list-inside space-y-0.5 text-slate-300 print:text-slate-700">
                   {swotGrouped.opportunities.map((s) => (
-                    <li key={s.id}>{s.text}</li>
+                    <li key={s.id}>{s.factor || (s as any).text || s.description || 'Oportunidade mapeada'}</li>
                   ))}
                 </ul>
               </div>
@@ -771,7 +927,7 @@ ${recommendations}
                 </p>
                 <ul className="list-disc list-inside space-y-0.5 text-slate-300 print:text-slate-700">
                   {swotGrouped.threats.map((s) => (
-                    <li key={s.id}>{s.text}</li>
+                    <li key={s.id}>{s.factor || (s as any).text || s.description || 'Ameaça mapeada'}</li>
                   ))}
                 </ul>
               </div>
@@ -793,23 +949,24 @@ ${recommendations}
                   className="p-4 bg-slate-800/60 rounded-lg border border-slate-750 space-y-2 print:bg-slate-50 print:border-slate-200"
                 >
                   <p className="font-bold text-slate-100 print:text-slate-900">
-                    Problema Central: <span className="text-rose-400 print:text-rose-700">{ish.effect}</span>
+                    Problema Central:{' '}
+                    <span className="text-rose-400 print:text-rose-700">
+                      {ish.problemStatement || ish.problem || (ish as any).effect || ish.description || 'Problema em análise'}
+                    </span>
                   </p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
-                    {Object.entries(ish.categories || {}).map(([cat, causes]) => (
-                      <div key={cat} className="p-2 bg-slate-900/50 rounded border border-slate-800 print:bg-white print:border-slate-200">
-                        <strong className="text-[11px] text-slate-300 print:text-slate-800 capitalize block mb-0.5">
-                          {cat}
-                        </strong>
-                        <ul className="list-disc list-inside space-y-0.5 text-[10px] text-slate-400 print:text-slate-600">
-                          {Array.isArray(causes) && causes.length > 0 ? (
-                            causes.map((c, i) => <li key={i}>{typeof c === 'string' ? c : (c as any).text}</li>)
-                          ) : (
-                            <li className="italic text-slate-500">Sem causas</li>
-                          )}
-                        </ul>
-                      </div>
-                    ))}
+                    {ish.causes && ish.causes.length > 0 ? (
+                      ish.causes.map((c, i) => (
+                        <div key={i} className="p-2 bg-slate-900/50 rounded border border-slate-800 print:bg-white print:border-slate-200">
+                          <strong className="text-[11px] text-slate-300 print:text-slate-800 capitalize block mb-0.5">
+                            {c.category}
+                          </strong>
+                          <p className="text-[10px] text-slate-400 print:text-slate-600">{c.cause}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="italic text-slate-500 text-xs">Sem causas detalhadas registradas.</p>
+                    )}
                   </div>
                 </div>
               ))}
@@ -874,11 +1031,13 @@ ${recommendations}
               <tbody className="divide-y divide-slate-800/70 print:divide-slate-100">
                 {currentProjectTasks.map((t) => (
                   <tr key={t.id}>
-                    <td className="p-2 font-bold text-slate-200 print:text-slate-900">{t.title}</td>
+                    <td className="p-2 font-bold text-slate-200 print:text-slate-900">{t.name || (t as any).title}</td>
                     <td className="p-2 text-slate-400 print:text-slate-700 font-mono">{t.startDate}</td>
                     <td className="p-2 text-slate-400 print:text-slate-700 font-mono">{t.endDate}</td>
-                    <td className="p-2 text-slate-300 print:text-slate-800">{t.assignee || 'Consultor'}</td>
-                    <td className="p-2 font-mono text-slate-300 print:text-slate-900">{t.progress}%</td>
+                    <td className="p-2 text-slate-300 print:text-slate-800">{t.responsible || (t as any).assignee || 'Consultor'}</td>
+                    <td className="p-2 font-mono text-slate-300 print:text-slate-900">
+                      {t.progressPercent !== undefined ? t.progressPercent : (t as any).progress || 0}%
+                    </td>
                     <td className="p-2 text-slate-300 print:text-slate-800">{t.status}</td>
                   </tr>
                 ))}
@@ -936,12 +1095,16 @@ ${recommendations}
                 Principais Causas Mapeadas por Volume/Impacto:
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {currentProjectPareto.slice(0, 4).map((p) => (
-                  <div key={p.id} className="p-2 bg-slate-900/50 rounded border border-slate-800 print:bg-white print:border-slate-200">
-                    <span className="text-[11px] font-semibold text-slate-200 print:text-slate-900 block truncate">{p.category}</span>
-                    <span className="text-[10px] text-blue-400 print:text-blue-700 font-bold">{p.count} ocorrências ({p.percentage}%)</span>
-                  </div>
-                ))}
+                {currentProjectPareto.slice(0, 4).map((p) => {
+                  const totalParetoCount = currentProjectPareto.reduce((acc, it) => acc + (it.count || 0), 0) || 1;
+                  const pct = Math.round(((p.count || 0) / totalParetoCount) * 100);
+                  return (
+                    <div key={p.id} className="p-2 bg-slate-900/50 rounded border border-slate-800 print:bg-white print:border-slate-200">
+                      <span className="text-[11px] font-semibold text-slate-200 print:text-slate-900 block truncate">{p.category}</span>
+                      <span className="text-[10px] text-blue-400 print:text-blue-700 font-bold">{p.count} ocorrências ({pct}%)</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -1018,7 +1181,7 @@ ${recommendations}
         )}
 
         {/* Formal Signatures Footer */}
-        <div className="mt-12 pt-8 border-t border-slate-800 grid grid-cols-2 gap-8 text-center text-xs print:border-slate-300">
+        <div className="mt-12 pt-8 border-t border-slate-800 grid grid-cols-2 gap-8 text-center text-xs print:border-slate-300 break-inside-avoid">
           <div>
             <div className="border-t border-slate-700 w-48 mx-auto mb-1 pt-1 print:border-slate-400" />
             <p className="font-bold text-slate-100 print:text-slate-900">{currentProject.leadConsultant}</p>

@@ -61,27 +61,79 @@ textarea:-webkit-autofill:active {
 }
 
 @media print {
-  body {
-    background: white !important;
-    color: black !important;
+  @page {
+    size: A4 portrait;
+    margin: 12mm 14mm 14mm 14mm;
   }
-  
-  .no-print, nav, aside, header, .sidebar-container, button.action-btn {
+
+  *, *:before, *:after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  html, body, #root, main {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  .no-print,
+  nav,
+  aside,
+  header,
+  .sidebar-container,
+  button,
+  .print\\:hidden {
     display: none !important;
   }
-  
+
+  .print\\:block {
+    display: block !important;
+  }
+
   .print-only {
     display: block !important;
   }
-  
+
   .print-container {
     width: 100% !important;
+    max-width: 100% !important;
     padding: 0 !important;
     margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
   }
-  
+
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    page-break-inside: auto !important;
+  }
+
+  tr, .print-card, .break-inside-avoid {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+
+  h1, h2, h3, h4 {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+    color: #0f172a !important;
+  }
+
   .page-break {
-    page-break-before: always;
+    page-break-before: always !important;
+    break-before: page !important;
   }
 }
 
