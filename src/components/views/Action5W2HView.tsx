@@ -26,13 +26,23 @@ export const Action5W2HView: React.FC = () => {
   const {
     currentProject,
     currentProjectActions,
+    addAction5W2H,
+    updateAction5W2H,
+    deleteAction5W2H,
+    duplicateAction5W2H,
     addAction,
     updateAction,
     deleteAction,
     duplicateAction,
     formatCurrency,
     settings,
+    setActiveModule,
   } = useConsulting();
+
+  const handleAddAction = addAction5W2H || addAction;
+  const handleUpdateAction = updateAction5W2H || updateAction;
+  const handleDeleteAction = deleteAction5W2H || deleteAction;
+  const handleDuplicateAction = duplicateAction5W2H || duplicateAction;
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -74,7 +84,28 @@ export const Action5W2HView: React.FC = () => {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   if (!currentProject) {
-    return <div className="p-8 text-center bg-slate-900 border border-slate-800 rounded-xl text-slate-400">Selecione um projeto primeiro.</div>;
+    return (
+      <div className="space-y-6">
+        <Breadcrumbs
+          title="Plano de Ação 5W2H"
+          subtitle="Quadro de execução tática: O que, Por que, Onde, Quando, Quem, Como e Quanto Custa"
+        />
+        <div className="p-12 text-center bg-slate-900/80 rounded-2xl border border-slate-800 text-slate-300 max-w-xl mx-auto my-12 space-y-4">
+          <CheckSquare2 className="w-12 h-12 text-blue-500 mx-auto" />
+          <h3 className="text-xl font-bold text-white">Nenhum projeto selecionado</h3>
+          <p className="text-sm text-slate-400">
+            Para gerenciar e criar ações 5W2H, cadastre ou selecione um projeto de consultoria.
+          </p>
+          <button
+            onClick={() => setActiveModule('projects')}
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold transition-all shadow-lg shadow-blue-600/20 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Ir para Projetos</span>
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const responsibles = Array.from(new Set(currentProjectActions.map((a) => a.who))).filter(Boolean);
@@ -142,7 +173,7 @@ export const Action5W2HView: React.FC = () => {
     }
 
     if (editingAction) {
-      updateAction(editingAction.id, {
+      handleUpdateAction?.(editingAction.id, {
         what: formData.what,
         why: formData.why,
         where: formData.where,
@@ -157,8 +188,7 @@ export const Action5W2HView: React.FC = () => {
         relatedTool: formData.relatedTool,
       });
     } else {
-      addAction({
-        projectId: currentProject.id,
+      handleAddAction?.({
         what: formData.what,
         why: formData.why,
         where: formData.where,
@@ -180,7 +210,7 @@ export const Action5W2HView: React.FC = () => {
     const action = currentProjectActions.find((a) => a.id === id);
     if (!action) return;
     const p = newStatus === 'Concluída' ? 100 : action.progressPercent;
-    updateAction(id, { status: newStatus, progressPercent: p });
+    handleUpdateAction?.(id, { status: newStatus, progressPercent: p });
   };
 
   const exportCSV = () => {
@@ -493,7 +523,7 @@ export const Action5W2HView: React.FC = () => {
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
                         <button
-                          onClick={() => duplicateAction(action.id)}
+                          onClick={() => handleDuplicateAction?.(action.id)}
                           className="p-1 text-slate-400 hover:text-blue-400 rounded cursor-pointer"
                           title="Duplicar ação"
                         >
@@ -813,8 +843,8 @@ export const Action5W2HView: React.FC = () => {
         isOpen={!!deleteConfirmId}
         onClose={() => setDeleteConfirmId(null)}
         onConfirm={() => {
-          if (deleteConfirmId) {
-            deleteAction(deleteConfirmId);
+          if (deleteConfirmId && handleDeleteAction) {
+            handleDeleteAction(deleteConfirmId);
             setDeleteConfirmId(null);
           }
         }}

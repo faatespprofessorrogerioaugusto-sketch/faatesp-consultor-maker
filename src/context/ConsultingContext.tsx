@@ -119,6 +119,10 @@ interface ConsultingContextType {
   updateAction5W2H: (id: string, updates: Partial<Action5W2H>) => void;
   deleteAction5W2H: (id: string) => void;
   duplicateAction5W2H: (id: string) => void;
+  addAction?: (action: Omit<Action5W2H, 'id' | 'createdAt' | 'updatedAt' | 'projectId'>) => void;
+  updateAction?: (id: string, updates: Partial<Action5W2H>) => void;
+  deleteAction?: (id: string) => void;
+  duplicateAction?: (id: string) => void;
 
   // Risks
   risks: RiskItem[];
@@ -1445,13 +1449,13 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     if (!orig) return;
     const dup: Action5W2H = {
       ...orig,
-      id: `act-${Date.now()}`,
+      id: `act-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
       what: `${orig.what} (Cópia)`,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
     setActions5W2H((prev) => [dup, ...prev]);
-    showToast('Ação 5W2H duplicada.');
+    showToast(`Ação "${orig.what}" duplicada.`);
   };
 
   // Risks CRUD
@@ -2395,6 +2399,10 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         updateAction5W2H,
         deleteAction5W2H,
         duplicateAction5W2H,
+        addAction: addAction5W2H,
+        updateAction: updateAction5W2H,
+        deleteAction: deleteAction5W2H,
+        duplicateAction: duplicateAction5W2H,
 
         risks,
         currentProjectRisks,

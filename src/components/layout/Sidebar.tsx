@@ -139,6 +139,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           icon: <Compass className="w-4 h-4" />,
           badgeCount: currentProjectBscObjectives.length,
         },
+      ],
+    },
+    {
+      title: 'CULTURA ORGANIZACIONAL',
+      items: [
         {
           id: '5w2h',
           label: 'Plano de Ação (5W2H)',
@@ -146,11 +151,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           badgeCount: currentProjectActions.filter((a) => a.status !== 'Concluída').length,
           badgeColor: 'bg-amber-500 text-white',
         },
-      ],
-    },
-    {
-      title: 'CULTURA ORGANIZACIONAL',
-      items: [
         {
           id: 'climate',
           label: 'Pesquisa de Clima Organizacional',
