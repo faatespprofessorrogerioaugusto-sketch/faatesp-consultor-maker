@@ -123,7 +123,7 @@ export function generatePlanForProject(ctx: PlanGenerationContext): ConsultingPl
   let methodologiesAndTools = 
 `Para a condução deste trabalho de consultoria, serão empregadas metodologias de diagnóstico, planejamento e acompanhamento:
 1. Ferramentas de Diagnóstico: Análise SWOT, Diagrama de Pareto, Matriz de Riscos e Pesquisa de Clima Organizacional.
-2. Ferramentas de Planejamento e Execução: OKRs (Objectives and Key Results), Diagrama de Gantt e Planos de Ação 5W2H.
+2. Ferramentas de Planejamento e Execução: Balanced Scorecard (BSC), Diagrama de Gantt e Planos de Ação 5W2H.
 3. Técnicas de Coleta de Dados: Entrevistas semiestruturadas com lideranças, questionários com colaboradores e análise documental.`;
 
   // 5. Cronograma das Fases do Processo

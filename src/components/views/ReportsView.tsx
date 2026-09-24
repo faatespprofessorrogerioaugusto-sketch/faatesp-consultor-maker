@@ -27,6 +27,7 @@ import {
   Clock,
   Briefcase,
   Check,
+  Compass,
 } from 'lucide-react';
 
 export const ReportsView: React.FC = () => {
@@ -50,6 +51,7 @@ export const ReportsView: React.FC = () => {
     settings,
     formatCurrency,
     showToast,
+    calculateRiskClass,
   } = useConsulting();
 
   // Derived client for current project
@@ -95,12 +97,17 @@ export const ReportsView: React.FC = () => {
     return (ishikawaAnalyses || []).filter((i) => i.projectId === currentProjectId);
   }, [ishikawaAnalyses, currentProjectId]);
 
+  const projectBscObjectives = useMemo(() => {
+    return (bscObjectives || []).filter((b) => !b.projectId || b.projectId === currentProjectId);
+  }, [bscObjectives, currentProjectId]);
+
   // Selection of included modules in the executive report
   const [includedModules, setIncludedModules] = useState({
     executiveSummary: true,
     contract: true,
     meetings: true,
-    okrs: true,
+    bsc: true,
+    okrs: false,
     swot: true,
     ishikawa: true,
     actions5w2h: true,
@@ -384,7 +391,7 @@ ${recommendations}
               { key: 'executiveSummary', label: 'Sumário Executivo' },
               { key: 'contract', label: 'Contrato de Serviço' },
               { key: 'meetings', label: 'Simulador de Reunião' },
-              { key: 'okrs', label: 'OKRs & Metas' },
+              { key: 'bsc', label: 'Balanced Scorecard (BSC)' },
               { key: 'swot', label: 'Análise SWOT' },
               { key: 'ishikawa', label: 'Diagrama Ishikawa' },
               { key: 'actions5w2h', label: 'Plano 5W2H' },
@@ -508,8 +515,8 @@ ${recommendations}
                 <strong className="text-sm font-bold text-slate-100 print:text-slate-900">{currentProjectRisks.length}</strong>
               </div>
               <div className="p-2.5 bg-slate-800/60 rounded-lg border border-slate-750 print:bg-slate-50 print:border-slate-200">
-                <span className="text-[10px] text-slate-400 print:text-slate-600 block">OKRs & Metas</span>
-                <strong className="text-sm font-bold text-slate-100 print:text-slate-900">{projectOkrs.length}</strong>
+                <span className="text-[10px] text-slate-400 print:text-slate-600 block">Metas BSC</span>
+                <strong className="text-sm font-bold text-slate-100 print:text-slate-900">{projectBscObjectives.length}</strong>
               </div>
               <div className="p-2.5 bg-slate-800/60 rounded-lg border border-slate-750 print:bg-slate-50 print:border-slate-200">
                 <span className="text-[10px] text-slate-400 print:text-slate-600 block">Diagnósticos de Clima</span>
@@ -581,12 +588,82 @@ ${recommendations}
           </div>
         )}
 
-        {/* Section 4: Objetivos e Resultados-Chave (OKRs & Metas) */}
-        {(includedModules.okrs || (includedModules as any).bsc) && projectOkrs.length > 0 && (
+        {/* Section 4: Balanced Scorecard (BSC) */}
+        {includedModules.bsc && projectBscObjectives.length > 0 && (
+          <div className="mb-8 space-y-3">
+            <h2 className="text-sm font-black text-slate-100 uppercase tracking-wider border-b border-slate-800 pb-1 print:text-slate-900 print:border-slate-300 flex items-center gap-1.5">
+              <Compass className="w-4 h-4 text-blue-400 print:text-slate-800" />
+              4. Balanced Scorecard (BSC) & Metas Estratégicas ({projectBscObjectives.length})
+            </h2>
+            <div className="space-y-4 text-xs overflow-x-auto">
+              <table className="w-full text-left text-xs border border-slate-800 divide-y divide-slate-800 print:border-slate-200 print:divide-slate-200">
+                <thead className="bg-slate-800 text-[10px] font-bold text-slate-300 uppercase print:bg-slate-100 print:text-slate-700">
+                  <tr>
+                    <th className="p-2">Perspectiva</th>
+                    <th className="p-2">Objetivo Estratégico</th>
+                    <th className="p-2">Indicador (KPI)</th>
+                    <th className="p-2 text-right">Realizado</th>
+                    <th className="p-2 text-right">Meta</th>
+                    <th className="p-2 text-center">Progresso</th>
+                    <th className="p-2">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800/70 print:divide-slate-100">
+                  {projectBscObjectives.map((b) => {
+                    const prog = b.targetValue > 0 ? Math.min(100, Math.round((b.currentValue / b.targetValue) * 100)) : 0;
+                    const perspLabels: Record<string, string> = {
+                      financial: '1. Financeira',
+                      customer: '2. Clientes & Mercado',
+                      internal: '3. Processos Internos',
+                      learning: '4. Aprendizado & Crescimento',
+                    };
+                    const statusLabels: Record<string, string> = {
+                      achieved: 'Alcançado',
+                      on_track: 'No Prazo',
+                      warning: 'Atenção',
+                      critical: 'Crítico',
+                    };
+                    return (
+                      <tr key={b.id}>
+                        <td className="p-2 font-semibold text-blue-400 print:text-blue-700 whitespace-nowrap">
+                          {perspLabels[b.perspective] || b.perspective}
+                        </td>
+                        <td className="p-2 font-medium text-slate-200 print:text-slate-800">
+                          {b.name}
+                          {b.initiatives && (
+                            <span className="block text-[10px] text-slate-400 print:text-slate-600 mt-0.5">
+                              Iniciativa: {b.initiatives}
+                            </span>
+                          )}
+                        </td>
+                        <td className="p-2 text-slate-300 print:text-slate-700">{b.kpi}</td>
+                        <td className="p-2 text-right font-mono font-bold text-slate-100 print:text-slate-900">
+                          {b.currentValue} {b.unit}
+                        </td>
+                        <td className="p-2 text-right font-mono text-slate-300 print:text-slate-700 font-semibold">
+                          {b.targetValue} {b.unit}
+                        </td>
+                        <td className="p-2 text-center">
+                          <span className="font-bold text-slate-100 print:text-slate-900">{prog}%</span>
+                        </td>
+                        <td className="p-2 font-bold text-blue-400 print:text-blue-700">
+                          {statusLabels[b.status] || b.status}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Section: Objetivos e Resultados-Chave (OKRs & Metas) */}
+        {includedModules.okrs && projectOkrs.length > 0 && (
           <div className="mb-8 space-y-3">
             <h2 className="text-sm font-black text-slate-100 uppercase tracking-wider border-b border-slate-800 pb-1 print:text-slate-900 print:border-slate-300 flex items-center gap-1.5">
               <Target className="w-4 h-4 text-blue-400 print:text-slate-800" />
-              4. Objetivos e Resultados-Chave (OKRs & Metas) — Desdobramento Estratégico ({projectOkrs.length})
+              Objetivos e Resultados-Chave (OKRs & Metas) — Desdobramento Estratégico ({projectOkrs.length})
             </h2>
             <div className="space-y-4 text-xs">
               {projectOkrs.map((obj) => (
@@ -838,7 +915,7 @@ ${recommendations}
                   </div>
                   <div className="text-right font-bold text-xs shrink-0 text-slate-300 print:text-slate-900">
                     <span>
-                      {r.classification} (Score {r.riskScore})
+                      {(calculateRiskClass ? calculateRiskClass(r.riskScore) : r.classification)} (Score {r.riskScore})
                     </span>
                   </div>
                 </div>

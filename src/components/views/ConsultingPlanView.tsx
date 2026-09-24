@@ -156,7 +156,7 @@ ${formData.generalObservations}
                 )}
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
-                Consolidação automática dos diagnósticos (SWOT, Pareto, Riscos, Clima), OKRs, Gantt e Planos 5W2H.
+                Consolidação automática dos diagnósticos (SWOT, Pareto, Riscos, Clima), Balanced Scorecard (BSC), Gantt e Planos 5W2H.
               </p>
             </div>
           </div>
@@ -244,7 +244,7 @@ ${formData.generalObservations}
           <p className="text-slate-300 leading-relaxed">
             Este Plano de Consultoria mapeia e consolida em tempo real as informações de <strong>Cadastro de Clientes</strong>, 
             <strong> Escopo do Projeto</strong>, <strong>Análise SWOT</strong>, <strong>Diagrama de Pareto (80/20)</strong>, 
-            <strong> Matriz de Riscos</strong>, <strong>Pesquisa de Clima</strong>, <strong>OKRs</strong>, 
+            <strong> Matriz de Riscos</strong>, <strong>Pesquisa de Clima</strong>, <strong>Balanced Scorecard (BSC)</strong>, 
             <strong> Diagrama de Gantt</strong> e <strong>Planos de Ação 5W2H</strong>.
           </p>
         </div>

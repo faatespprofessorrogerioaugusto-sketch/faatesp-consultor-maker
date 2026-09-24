@@ -21,6 +21,7 @@ import {
   FileSignature,
   Presentation,
   FileText,
+  Compass,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -46,6 +47,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     currentProjectRisks,
     currentProjectClimateSurveys,
     currentProjectOkrs,
+    currentProjectBscObjectives = [],
     settings,
   } = useConsulting();
 
@@ -132,10 +134,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
           badgeCount: currentProjectTasks.length,
         },
         {
-          id: 'okrs',
-          label: 'OKR',
-          icon: <Target className="w-4 h-4" />,
-          badgeCount: currentProjectOkrs.length,
+          id: 'bsc',
+          label: 'Balanced Scorecard (BSC)',
+          icon: <Compass className="w-4 h-4" />,
+          badgeCount: currentProjectBscObjectives.length,
         },
         {
           id: '5w2h',

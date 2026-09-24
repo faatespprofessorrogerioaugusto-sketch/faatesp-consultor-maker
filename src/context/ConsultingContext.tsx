@@ -191,6 +191,7 @@ interface ConsultingContextType {
 
   // Balanced Scorecard (BSC)
   bscObjectives: BSCObjective[];
+  currentProjectBscObjectives?: BSCObjective[];
   addBscObjective: (objective: Omit<BSCObjective, 'id' | 'projectId'>) => void;
   updateBscObjective: (id: string, objective: Partial<BSCObjective>) => void;
   deleteBscObjective: (id: string) => void;
@@ -335,7 +336,19 @@ export const loadDataForGroup = (groupName: string, userEmail: string = '') => {
       consultingPlans: getSaved<ConsultingPlan[]>('consulting_plans', []),
       meetings: getSaved<MeetingSimulation[]>('meetings', initialMeetings),
       reportConfig: getSaved<ConsultingReportConfig>('report', initialReportConfig),
-      settings: getSaved<AppSettings>('settings', { ...initialSettings, consultancyName: groupName }),
+      settings: (() => {
+        const raw = getSaved<AppSettings>('settings', { ...initialSettings, consultancyName: groupName });
+        const rawTh = raw.riskScoreThresholds || (raw as any).riskThresholds || {};
+        return {
+          ...raw,
+          riskScoreThresholds: {
+            critical: (rawTh.critical && rawTh.critical >= 20) ? rawTh.critical : 21,
+            high: (rawTh.high && rawTh.high >= 16) ? rawTh.high : 16,
+            medium: (rawTh.medium && rawTh.medium >= 10) ? rawTh.medium : 11,
+            moderate: (rawTh.moderate && rawTh.moderate >= 5) ? rawTh.moderate : 6,
+          },
+        };
+      })(),
     };
   } else {
     // Generate the single dedicated example project package for the user's group type
@@ -813,9 +826,16 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const calculateRiskClass = (score: number): RiskClassification => {
-    if (score >= settings.riskThresholds.critical) return 'Crítico';
-    if (score >= settings.riskThresholds.high) return 'Alto';
-    if (score >= settings.riskThresholds.moderate) return 'Moderado';
+    const rawTh = (settings as any)?.riskScoreThresholds || (settings as any)?.riskThresholds || {};
+    const critical = (rawTh.critical && rawTh.critical >= 20) ? rawTh.critical : 21;
+    const high = (rawTh.high && rawTh.high >= 16) ? rawTh.high : 16;
+    const medium = (rawTh.medium && rawTh.medium >= 10) ? rawTh.medium : 11;
+    const moderate = (rawTh.moderate && rawTh.moderate >= 5) ? rawTh.moderate : 6;
+
+    if (score >= critical) return 'Crítico';
+    if (score >= high) return 'Alto';
+    if (score >= medium) return 'Médio';
+    if (score >= moderate) return 'Moderado';
     return 'Baixo';
   };
 
@@ -896,6 +916,11 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const currentProjectOkrs = useMemo(
     () => okrs.filter((o) => o.projectId === currentProjectId),
     [okrs, currentProjectId]
+  );
+
+  const currentProjectBscObjectives = useMemo(
+    () => bscObjectives.filter((b) => !b.projectId || b.projectId === currentProjectId),
+    [bscObjectives, currentProjectId]
   );
 
   const currentProjectClimateSurveys = useMemo(
@@ -1095,6 +1120,14 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }));
     setClimateSurveys((prev) => [...prev, ...newClimate]);
 
+    const origBsc = bscObjectives.filter((b) => b.projectId === id);
+    const newBsc = origBsc.map((b) => ({
+      ...b,
+      id: `bsc-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      projectId: newId,
+    }));
+    setBscObjectives((prev) => [...prev, ...newBsc]);
+
     setCurrentProjectId(newId);
     showToast(`Projeto duplicado como "${dup.name}"!`);
     return newId;
@@ -1132,6 +1165,7 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setCanvasModels((prev) => prev.filter((c) => c.projectId !== id));
     setOkrs((prev) => prev.filter((o) => o.projectId !== id));
     setClimateSurveys((prev) => prev.filter((c) => c.projectId !== id));
+    setBscObjectives((prev) => prev.filter((b) => b.projectId !== id));
 
     showToast('Projeto e todos os seus registros excluídos com sucesso.', 'info');
   };
@@ -2383,6 +2417,7 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         convertClimateCommentTo5W2H,
 
         bscObjectives,
+        currentProjectBscObjectives,
         addBscObjective,
         updateBscObjective,
         deleteBscObjective,

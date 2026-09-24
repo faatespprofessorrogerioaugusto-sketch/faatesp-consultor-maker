@@ -7,6 +7,8 @@ interface BadgeProps {
     | 'blue'
     | 'emerald'
     | 'amber'
+    | 'orange'
+    | 'yellow'
     | 'rose'
     | 'indigo'
     | 'purple'
@@ -28,6 +30,8 @@ export const Badge: React.FC<BadgeProps> = ({
     blue: 'bg-blue-950/60 text-blue-300 border-blue-800/60',
     emerald: 'bg-emerald-950/60 text-emerald-300 border-emerald-800/60',
     amber: 'bg-amber-950/60 text-amber-300 border-amber-800/60',
+    orange: 'bg-orange-950/60 text-orange-300 border-orange-800/60',
+    yellow: 'bg-yellow-950/60 text-yellow-300 border-yellow-700/60',
     rose: 'bg-rose-950/60 text-rose-300 border-rose-800/60',
     indigo: 'bg-indigo-950/60 text-indigo-300 border-indigo-800/60',
     purple: 'bg-purple-950/60 text-purple-300 border-purple-800/60',
@@ -39,6 +43,8 @@ export const Badge: React.FC<BadgeProps> = ({
     blue: 'bg-blue-400',
     emerald: 'bg-emerald-400',
     amber: 'bg-amber-400',
+    orange: 'bg-orange-400',
+    yellow: 'bg-yellow-400',
     rose: 'bg-rose-400',
     indigo: 'bg-indigo-400',
     purple: 'bg-purple-400',
@@ -109,13 +115,19 @@ export const RiskBadge: React.FC<{
       );
     case 'Alto':
       return (
-        <Badge variant="amber" size={size} dot>
+        <Badge variant="orange" size={size} dot>
+          {label}
+        </Badge>
+      );
+    case 'Médio':
+      return (
+        <Badge variant="blue" size={size} dot>
           {label}
         </Badge>
       );
     case 'Moderado':
       return (
-        <Badge variant="blue" size={size} dot>
+        <Badge variant="yellow" size={size} dot>
           {label}
         </Badge>
       );

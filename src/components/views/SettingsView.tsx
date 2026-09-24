@@ -36,7 +36,15 @@ export const SettingsView: React.FC = () => {
     cleanCurrentGroupData,
   } = useConsulting();
 
-  const [formSettings, setFormSettings] = useState(settings);
+  const [formSettings, setFormSettings] = useState(() => ({
+    ...settings,
+    riskScoreThresholds: {
+      critical: (settings?.riskScoreThresholds?.critical && settings.riskScoreThresholds.critical >= 20) ? settings.riskScoreThresholds.critical : 21,
+      high: (settings?.riskScoreThresholds?.high && settings.riskScoreThresholds.high >= 16) ? settings.riskScoreThresholds.high : 16,
+      medium: ((settings?.riskScoreThresholds as any)?.medium && (settings?.riskScoreThresholds as any).medium >= 10) ? (settings?.riskScoreThresholds as any).medium : 11,
+      moderate: (settings?.riskScoreThresholds?.moderate && settings.riskScoreThresholds.moderate >= 5) ? settings.riskScoreThresholds.moderate : 6,
+    },
+  }));
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [cleanGroupConfirmOpen, setCleanGroupConfirmOpen] = useState(false);
@@ -194,10 +202,11 @@ export const SettingsView: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
             <div className="p-3 bg-rose-950/40 rounded-lg border border-rose-900/60">
-              <label className="block font-bold text-rose-300 uppercase mb-1">
-                Nível Crítico (Score &ge;)
+              <label className="block font-bold text-rose-300 uppercase mb-1 flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+                Crítico (Vermelho) &ge;
               </label>
               <input
                 type="number"
@@ -223,11 +232,13 @@ export const SettingsView: React.FC = () => {
                 }
                 className="w-full bg-slate-800 border border-rose-800/80 rounded p-2 font-bold font-mono text-rose-200 focus:outline-none"
               />
+              <span className="text-[10px] text-slate-400 mt-1 block">Padrão: 21 (Score 21-25)</span>
             </div>
 
-            <div className="p-3 bg-amber-950/40 rounded-lg border border-amber-900/60">
-              <label className="block font-bold text-amber-300 uppercase mb-1">
-                Nível Alto (Score &ge;)
+            <div className="p-3 bg-orange-950/40 rounded-lg border border-orange-900/60">
+              <label className="block font-bold text-orange-300 uppercase mb-1 flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-orange-500" />
+                Alto (Laranja) &ge;
               </label>
               <input
                 type="number"
@@ -251,13 +262,47 @@ export const SettingsView: React.FC = () => {
                     },
                   })
                 }
-                className="w-full bg-slate-800 border border-amber-800/80 rounded p-2 font-bold font-mono text-amber-200 focus:outline-none"
+                className="w-full bg-slate-800 border border-orange-800/80 rounded p-2 font-bold font-mono text-orange-200 focus:outline-none"
               />
+              <span className="text-[10px] text-slate-400 mt-1 block">Padrão: 16 (Score 16-20)</span>
             </div>
 
             <div className="p-3 bg-blue-950/40 rounded-lg border border-blue-900/60">
-              <label className="block font-bold text-blue-300 uppercase mb-1">
-                Nível Moderado (Score &ge;)
+              <label className="block font-bold text-blue-300 uppercase mb-1 flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+                Médio (Azul) &ge;
+              </label>
+              <input
+                type="number"
+                min={1}
+                max={25}
+                name="settings_risk_medium_field"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                data-lpignore="true"
+                data-1p-ignore="true"
+                data-form-type="other"
+                value={(formSettings.riskScoreThresholds as any).medium ?? 11}
+                onChange={(e) =>
+                  setFormSettings({
+                    ...formSettings,
+                    riskScoreThresholds: {
+                      ...formSettings.riskScoreThresholds,
+                      medium: Number(e.target.value),
+                    },
+                  })
+                }
+                className="w-full bg-slate-800 border border-blue-800/80 rounded p-2 font-bold font-mono text-blue-200 focus:outline-none"
+              />
+              <span className="text-[10px] text-slate-400 mt-1 block">Padrão: 11 (Score 11-15)</span>
+            </div>
+
+            <div className="p-3 bg-yellow-950/40 rounded-lg border border-yellow-800/60">
+              <label className="block font-bold text-yellow-300 uppercase mb-1 flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
+                Moderado (Amarelo) &ge;
               </label>
               <input
                 type="number"
@@ -281,9 +326,20 @@ export const SettingsView: React.FC = () => {
                     },
                   })
                 }
-                className="w-full bg-slate-800 border border-blue-800/80 rounded p-2 font-bold font-mono text-blue-200 focus:outline-none"
+                className="w-full bg-slate-800 border border-yellow-700/80 rounded p-2 font-bold font-mono text-yellow-200 focus:outline-none"
               />
+              <span className="text-[10px] text-slate-400 mt-1 block">Padrão: 6 (Score 6-10)</span>
             </div>
+          </div>
+
+          <div className="p-3 bg-emerald-950/30 rounded-lg border border-emerald-900/50 flex items-center justify-between text-xs text-emerald-300">
+            <span className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+              <strong>Baixo (Verde):</strong> atribuído automaticamente para qualquer Score menor que o Nível Moderado (&lt; {formSettings.riskScoreThresholds.moderate})
+            </span>
+            <span className="font-mono text-[11px] text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">
+              Score 1 a {formSettings.riskScoreThresholds.moderate - 1}
+            </span>
           </div>
         </div>
 

@@ -31,6 +31,7 @@ export const DashboardView: React.FC = () => {
     currentProjectClimateSurveys,
     setActiveModule,
     formatCurrency,
+    calculateRiskClass,
   } = useConsulting();
 
   if (!currentProject) {
@@ -109,11 +110,13 @@ export const DashboardView: React.FC = () => {
   };
 
   // Risks by Level
+  const getRiskClass = (r: any) => (calculateRiskClass ? calculateRiskClass(r.riskScore) : r.classification);
   const risksByLevel = {
-    Crítico: currentProjectRisks.filter((r) => r.classification === 'Crítico').length,
-    Alto: currentProjectRisks.filter((r) => r.classification === 'Alto').length,
-    Moderado: currentProjectRisks.filter((r) => r.classification === 'Moderado').length,
-    Baixo: currentProjectRisks.filter((r) => r.classification === 'Baixo').length,
+    Crítico: currentProjectRisks.filter((r) => getRiskClass(r) === 'Crítico').length,
+    Alto: currentProjectRisks.filter((r) => getRiskClass(r) === 'Alto').length,
+    Médio: currentProjectRisks.filter((r) => getRiskClass(r) === 'Médio').length,
+    Moderado: currentProjectRisks.filter((r) => getRiskClass(r) === 'Moderado').length,
+    Baixo: currentProjectRisks.filter((r) => getRiskClass(r) === 'Baixo').length,
   };
 
   return (
@@ -446,19 +449,38 @@ export const DashboardView: React.FC = () => {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between p-2 rounded-lg bg-rose-950/40 border border-rose-800/60 text-xs">
-                <span className="font-semibold text-rose-300">Crítico (Score 16-25)</span>
+                <span className="font-semibold text-rose-300 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-rose-500" />
+                  Crítico (Vermelho • Score 21-25)
+                </span>
                 <span className="font-black text-rose-300 bg-slate-900 px-2 py-0.5 rounded border border-rose-800/80">{risksByLevel['Crítico']}</span>
               </div>
-              <div className="flex items-center justify-between p-2 rounded-lg bg-amber-950/40 border border-amber-800/60 text-xs">
-                <span className="font-semibold text-amber-300">Alto (Score 12-15)</span>
-                <span className="font-black text-amber-300 bg-slate-900 px-2 py-0.5 rounded border border-amber-800/80">{risksByLevel['Alto']}</span>
+              <div className="flex items-center justify-between p-2 rounded-lg bg-orange-950/40 border border-orange-800/60 text-xs">
+                <span className="font-semibold text-orange-300 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-orange-500" />
+                  Alto (Laranja • Score 16-20)
+                </span>
+                <span className="font-black text-orange-300 bg-slate-900 px-2 py-0.5 rounded border border-orange-800/80">{risksByLevel['Alto']}</span>
               </div>
               <div className="flex items-center justify-between p-2 rounded-lg bg-blue-950/40 border border-blue-800/60 text-xs">
-                <span className="font-semibold text-blue-300">Moderado (Score 6-11)</span>
-                <span className="font-black text-blue-300 bg-slate-900 px-2 py-0.5 rounded border border-blue-800/80">{risksByLevel['Moderado']}</span>
+                <span className="font-semibold text-blue-300 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-blue-500" />
+                  Médio (Azul • Score 11-15)
+                </span>
+                <span className="font-black text-blue-300 bg-slate-900 px-2 py-0.5 rounded border border-blue-800/80">{risksByLevel['Médio']}</span>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded-lg bg-yellow-950/40 border border-yellow-700/60 text-xs">
+                <span className="font-semibold text-yellow-300 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-yellow-400" />
+                  Moderado (Amarelo • Score 6-10)
+                </span>
+                <span className="font-black text-yellow-300 bg-slate-900 px-2 py-0.5 rounded border border-yellow-700/80">{risksByLevel['Moderado']}</span>
               </div>
               <div className="flex items-center justify-between p-2 rounded-lg bg-emerald-950/40 border border-emerald-800/60 text-xs">
-                <span className="font-semibold text-emerald-300">Baixo (Score 1-5)</span>
+                <span className="font-semibold text-emerald-300 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  Baixo (Verde • Score 1-5)
+                </span>
                 <span className="font-black text-emerald-300 bg-slate-900 px-2 py-0.5 rounded border border-emerald-800/80">{risksByLevel['Baixo']}</span>
               </div>
             </div>

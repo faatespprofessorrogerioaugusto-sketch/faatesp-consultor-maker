@@ -163,20 +163,28 @@ export const RiskMatrixView: React.FC = () => {
     return <div className="p-8 text-center bg-slate-900 border border-slate-800 rounded-xl text-slate-400">Selecione um projeto primeiro.</div>;
   }
 
-  // Safe thresholds
-  const thresholds = settings?.riskScoreThresholds || settings?.riskThresholds || {
-    critical: 16,
-    high: 12,
-    moderate: 6,
+  // Safe thresholds ensuring legacy cached settings don't shadow Médio (Azul)
+  const rawThresholds = settings?.riskScoreThresholds || (settings as any)?.riskThresholds || {};
+  const thresholds = {
+    critical: (rawThresholds.critical && rawThresholds.critical >= 20) ? rawThresholds.critical : 21,
+    high: (rawThresholds.high && rawThresholds.high >= 16) ? rawThresholds.high : 16,
+    medium: (rawThresholds.medium && rawThresholds.medium >= 10) ? rawThresholds.medium : 11,
+    moderate: (rawThresholds.moderate && rawThresholds.moderate >= 5) ? rawThresholds.moderate : 6,
   };
 
   const computeRiskClassification = (score: number): RiskClassification => {
     if (typeof calculateRiskClass === 'function') {
       return calculateRiskClass(score);
     }
-    if (score >= (thresholds.critical ?? 16)) return 'Crítico';
-    if (score >= (thresholds.high ?? 12)) return 'Alto';
-    if (score >= (thresholds.moderate ?? 6)) return 'Moderado';
+    const critical = thresholds.critical;
+    const high = thresholds.high;
+    const medium = thresholds.medium;
+    const moderate = thresholds.moderate;
+
+    if (score >= critical) return 'Crítico';
+    if (score >= high) return 'Alto';
+    if (score >= medium) return 'Médio';
+    if (score >= moderate) return 'Moderado';
     return 'Baixo';
   };
 
@@ -192,19 +200,29 @@ export const RiskMatrixView: React.FC = () => {
 
   const getCellColor = (p: number, i: number) => {
     const score = p * i;
-    const { critical = 16, high = 12, moderate = 6 } = thresholds;
-    if (score >= critical) return 'bg-rose-600 text-white hover:bg-rose-500';
-    if (score >= high) return 'bg-amber-600 text-white hover:bg-amber-500';
-    if (score >= moderate) return 'bg-blue-600 text-white hover:bg-blue-500';
-    return 'bg-emerald-600 text-white hover:bg-emerald-500';
+    const critical = thresholds.critical;
+    const high = thresholds.high;
+    const medium = thresholds.medium;
+    const moderate = thresholds.moderate;
+
+    if (score >= critical) return 'bg-rose-600 text-white hover:bg-rose-500'; // Vermelho (21-25)
+    if (score >= high) return 'bg-orange-600 text-white hover:bg-orange-500'; // Laranja (16-20)
+    if (score >= medium) return 'bg-blue-600 text-white hover:bg-blue-500'; // Azul (11-15)
+    if (score >= moderate) return 'bg-yellow-500 text-slate-950 font-bold hover:bg-yellow-400'; // Amarelo (6-10)
+    return 'bg-emerald-600 text-white hover:bg-emerald-500'; // Verde (1-5)
   };
 
   const getScoreColorClass = (score: number) => {
-    const { critical = 16, high = 12, moderate = 6 } = thresholds;
-    if (score >= critical) return 'text-rose-400 bg-rose-950/50 border-rose-800';
-    if (score >= high) return 'text-amber-400 bg-amber-950/50 border-amber-800';
-    if (score >= moderate) return 'text-blue-400 bg-blue-950/50 border-blue-800';
-    return 'text-emerald-400 bg-emerald-950/50 border-emerald-800';
+    const critical = thresholds.critical;
+    const high = thresholds.high;
+    const medium = thresholds.medium;
+    const moderate = thresholds.moderate;
+
+    if (score >= critical) return 'text-rose-400 bg-rose-950/50 border-rose-800'; // Vermelho
+    if (score >= high) return 'text-orange-400 bg-orange-950/50 border-orange-800'; // Laranja
+    if (score >= medium) return 'text-blue-400 bg-blue-950/50 border-blue-800'; // Azul
+    if (score >= moderate) return 'text-yellow-400 bg-yellow-950/50 border-yellow-800'; // Amarelo
+    return 'text-emerald-400 bg-emerald-950/50 border-emerald-800'; // Verde
   };
 
   const openCreateModal = (initP: number = 3, initI: number = 3) => {
@@ -319,8 +337,8 @@ export const RiskMatrixView: React.FC = () => {
   ];
 
   const impactLabels = [
-    { level: 1, label: 'Muito Baixo (1)' },
-    { level: 2, label: 'Baixo (2)' },
+    { level: 1, label: 'Baixo (1)' },
+    { level: 2, label: 'Moderado (2)' },
     { level: 3, label: 'Médio (3)' },
     { level: 4, label: 'Alto (4)' },
     { level: 5, label: 'Crítico (5)' },
@@ -384,10 +402,11 @@ export const RiskMatrixView: React.FC = () => {
               className="bg-slate-800 border border-slate-700 text-slate-200 rounded px-2 py-1 focus:outline-none"
             >
               <option value="all">Todas as classificações</option>
-              <option value="Crítico">Crítico (16-25)</option>
-              <option value="Alto">Alto (12-15)</option>
-              <option value="Moderado">Moderado (6-11)</option>
-              <option value="Baixo">Baixo (1-5)</option>
+              <option value="Crítico">Crítico (Vermelho • 21-25)</option>
+              <option value="Alto">Alto (Laranja • 16-20)</option>
+              <option value="Médio">Médio (Azul • 11-15)</option>
+              <option value="Moderado">Moderado (Amarelo • 6-10)</option>
+              <option value="Baixo">Baixo (Verde • 1-5)</option>
             </select>
           </div>
 
@@ -459,18 +478,21 @@ export const RiskMatrixView: React.FC = () => {
                   Clique em qualquer célula para filtrar os riscos ou adicionar diretamente
                 </p>
               </div>
-              <div className="flex items-center gap-2 text-[10px]">
+              <div className="flex items-center gap-2 text-[10px] flex-wrap">
                 <span className="flex items-center gap-1 text-slate-300">
-                  <span className="w-2.5 h-2.5 rounded bg-rose-500" /> Crítico
+                  <span className="w-2.5 h-2.5 rounded bg-rose-500" /> Crítico (Vermelho)
                 </span>
                 <span className="flex items-center gap-1 text-slate-300">
-                  <span className="w-2.5 h-2.5 rounded bg-amber-500" /> Alto
+                  <span className="w-2.5 h-2.5 rounded bg-orange-500" /> Alto (Laranja)
                 </span>
                 <span className="flex items-center gap-1 text-slate-300">
-                  <span className="w-2.5 h-2.5 rounded bg-blue-500" /> Mod.
+                  <span className="w-2.5 h-2.5 rounded bg-blue-500" /> Médio (Azul)
                 </span>
                 <span className="flex items-center gap-1 text-slate-300">
-                  <span className="w-2.5 h-2.5 rounded bg-emerald-500" /> Baixo
+                  <span className="w-2.5 h-2.5 rounded bg-yellow-500" /> Moderado (Amarelo)
+                </span>
+                <span className="flex items-center gap-1 text-slate-300">
+                  <span className="w-2.5 h-2.5 rounded bg-emerald-500" /> Baixo (Verde)
                 </span>
               </div>
             </div>
@@ -542,8 +564,8 @@ export const RiskMatrixView: React.FC = () => {
                 <div className="flex items-center gap-1.5 mt-2">
                   <span className="w-6 shrink-0" />
                   <div className="grid grid-cols-5 gap-1.5 flex-1 text-center text-xs font-bold text-slate-400">
-                    <span>1 (Muito Baixo)</span>
-                    <span>2 (Baixo)</span>
+                    <span>1 (Baixo)</span>
+                    <span>2 (Moderado)</span>
                     <span>3 (Médio)</span>
                     <span>4 (Alto)</span>
                     <span>5 (Crítico)</span>
@@ -609,7 +631,7 @@ export const RiskMatrixView: React.FC = () => {
                               {risk.category}
                             </span>
                             <RiskBadge
-                              classification={risk.classification}
+                              classification={computeRiskClassification(risk.riskScore)}
                               score={risk.riskScore}
                               size="sm"
                             />
@@ -725,7 +747,7 @@ export const RiskMatrixView: React.FC = () => {
                       {r.probability} × {r.impact} = {r.riskScore}
                     </td>
                     <td className="py-3 px-3">
-                      <RiskBadge classification={r.classification} score={r.riskScore} />
+                      <RiskBadge classification={computeRiskClassification(r.riskScore)} score={r.riskScore} />
                     </td>
                     <td className="py-3 px-4 text-slate-300">{r.preventiveAction || '-'}</td>
                     <td className="py-3 px-4 text-slate-300">{r.contingencyPlan || '-'}</td>

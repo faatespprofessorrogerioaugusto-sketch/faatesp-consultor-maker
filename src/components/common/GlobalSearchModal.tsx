@@ -15,6 +15,7 @@ import {
   GitBranch,
   HeartHandshake,
   Target,
+  Compass,
 } from 'lucide-react';
 
 interface GlobalSearchModalProps {
@@ -31,6 +32,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
     currentProjectPareto,
     currentProjectClimateSurveys,
     currentProjectOkrs,
+    currentProjectBscObjectives = [],
     currentProject,
     setActiveModule,
   } = useConsulting();
@@ -191,6 +193,26 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
       });
     });
 
+    // Balanced Scorecard (BSC)
+    (currentProjectBscObjectives || []).forEach((bsc) => {
+      if (
+        bsc.name.toLowerCase().includes(q) ||
+        bsc.kpi.toLowerCase().includes(q) ||
+        (bsc.description && bsc.description.toLowerCase().includes(q)) ||
+        (bsc.initiatives && bsc.initiatives.toLowerCase().includes(q)) ||
+        (bsc.responsible && bsc.responsible.toLowerCase().includes(q))
+      ) {
+        results.push({
+          id: bsc.id,
+          title: bsc.name,
+          subtitle: `BSC • Indicador: ${bsc.kpi} • Meta: ${bsc.targetValue} ${bsc.unit} (Real: ${bsc.currentValue} ${bsc.unit})`,
+          module: 'bsc',
+          moduleName: 'Balanced Scorecard (BSC)',
+          icon: <Compass className="w-4 h-4 text-emerald-400" />,
+        });
+      }
+    });
+
     return results;
   }, [
     query,
@@ -201,6 +223,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
     currentProjectPareto,
     currentProjectClimateSurveys,
     currentProjectOkrs,
+    currentProjectBscObjectives,
   ]);
 
   if (!isOpen) return null;

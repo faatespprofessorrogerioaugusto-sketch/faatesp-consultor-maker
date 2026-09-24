@@ -17,7 +17,7 @@ const moduleNames: Record<ModuleId, string> = {
   contract: 'Contrato de Prestação de Serviços',
   meeting: 'Simulador de Reunião',
   okrs: 'OKR',
-  bsc: 'OKR',
+  bsc: 'Balanced Scorecard (BSC)',
   swot: 'Análise SWOT',
   gantt: 'Diagrama de Gantt',
   actions5w2h: 'Plano de Ação (5W2H)',

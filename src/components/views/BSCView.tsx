@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useConsulting } from '../../context/ConsultingContext';
 import { BSCObjective, BSCPerspective } from '../../types';
+import { Breadcrumbs } from '../layout/Breadcrumbs';
 import {
   Compass,
   Plus,
@@ -171,6 +172,11 @@ export const BSCView: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      <Breadcrumbs
+        title="Balanced Scorecard (BSC)"
+        subtitle="Planejamento e Desdobramento Estratégico nas 4 Perspectivas"
+      />
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/80 p-5 rounded-2xl border border-slate-800 backdrop-blur-md">
         <div>

@@ -199,7 +199,7 @@ export interface Action5W2H {
 }
 
 /* 8. Risk Matrix */
-export type RiskClassification = 'Baixo' | 'Moderado' | 'Alto' | 'Crítico';
+export type RiskClassification = 'Baixo' | 'Moderado' | 'Médio' | 'Alto' | 'Crítico';
 export type RiskCategory =
   | 'Estratégico'
   | 'Operacional'
@@ -542,12 +542,14 @@ export interface AppSettings {
   dateFormat: string;
   swotMaxItemsPerQuadrant?: number;
   riskScoreThresholds: {
-    moderate: number; // score >= 6
-    high: number; // score >= 12
-    critical: number; // score >= 16
+    moderate: number; // score >= 6 (Amarelo: 6-10)
+    medium?: number; // score >= 11 (Azul: 11-15)
+    high: number; // score >= 16 (Laranja: 16-20)
+    critical: number; // score >= 21 (Vermelho: 21-25)
   };
   riskThresholds?: {
     moderate: number;
+    medium?: number;
     high: number;
     critical: number;
   };
