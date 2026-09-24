@@ -18,6 +18,8 @@ import {
   BarChart2,
   Grid2X2,
   HeartHandshake,
+  FolderKanban,
+  Plus,
 } from 'lucide-react';
 
 export const DashboardView: React.FC = () => {
@@ -36,8 +38,25 @@ export const DashboardView: React.FC = () => {
 
   if (!currentProject) {
     return (
-      <div className="p-8 text-center bg-slate-900 rounded-xl border border-slate-800 text-slate-300">
-        <p className="text-slate-400">Nenhum projeto selecionado.</p>
+      <div className="space-y-6">
+        <Breadcrumbs
+          title="Dashboard Geral"
+          subtitle="Visão consolidada do diagnóstico e planejamento estratégico"
+        />
+        <div className="p-12 text-center bg-slate-900/80 rounded-2xl border border-slate-800 text-slate-300 max-w-xl mx-auto my-12 space-y-4">
+          <FolderKanban className="w-12 h-12 text-blue-500 mx-auto" />
+          <h3 className="text-xl font-bold text-white">Nenhum projeto cadastrado</h3>
+          <p className="text-sm text-slate-400">
+            Seu ambiente começa em branco. Cadastre seu primeiro projeto de consultoria para liberar o painel executivo e todas as ferramentas de diagnóstico e planejamento.
+          </p>
+          <button
+            onClick={() => setActiveModule('projects')}
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold transition-all shadow-lg shadow-blue-600/20 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Criar Primeiro Projeto</span>
+          </button>
+        </div>
       </div>
     );
   }

@@ -52,6 +52,50 @@ export const getInitialDataForSpecificGroup = (
   userEmail: string = ''
 ): GroupInitialPackage => {
   const norm = (groupName || '').trim().toLowerCase();
+  const isProf =
+    norm === 'professor' ||
+    norm === 'grupo professor' ||
+    norm === 'professores' ||
+    norm === 'docente' ||
+    norm === 'coordenação' ||
+    norm === 'coordenacao';
+
+  // All users, including the Professor group, start completely blank
+  return {
+    projects: [],
+    clients: [],
+    swotItems: [],
+    ganttTasks: [],
+    ishikawaAnalyses: [],
+    actions5W2H: [],
+    risks: [],
+    paretoItems: [],
+    pestelItems: [],
+    stakeholders: [],
+    canvasModels: [],
+    okrs: [],
+    climateSurveys: [],
+    bscObjectives: [],
+    contracts: [],
+    meetings: [],
+    reportConfig: {
+      ...initialReportConfig,
+      consultantName: isProf ? 'Prof. Rogério Augusto' : '',
+      title: isProf ? 'Relatório de Supervisão e Consultoria' : 'Relatório Executivo de Consultoria',
+    },
+    settings: {
+      ...initialSettings,
+      consultancyName: isProf ? 'Supervisão Docente - Professor' : (groupName || 'Minha Consultoria'),
+      consultantDefaultName: isProf ? 'Prof. Rogério Augusto' : '',
+    },
+  };
+};
+
+export const getDemoTemplateForGroup = (
+  groupName: string,
+  userEmail: string = ''
+): GroupInitialPackage => {
+  const norm = (groupName || '').trim().toLowerCase();
 
   // -------------------------------------------------------------
   // 1. GRUPO 01: Transformação Digital & Omnichannel

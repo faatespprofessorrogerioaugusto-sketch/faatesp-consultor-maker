@@ -25,11 +25,21 @@ export const GanttView: React.FC = () => {
   const {
     currentProject,
     currentProjectTasks,
+    addGanttTask,
+    updateGanttTask,
+    deleteGanttTask,
+    duplicateGanttTask,
     addTask,
     updateTask,
     deleteTask,
     duplicateTask,
+    setActiveModule,
   } = useConsulting();
+
+  const handleAddTask = addGanttTask || addTask;
+  const handleUpdateTask = updateGanttTask || updateTask;
+  const handleDeleteTask = deleteGanttTask || deleteTask;
+  const handleDuplicateTask = duplicateGanttTask || duplicateTask;
 
   const [timeScale, setTimeScale] = useState<'days' | 'weeks' | 'months'>('weeks');
   const [stageFilter, setStageFilter] = useState<string>('all');
@@ -70,7 +80,28 @@ export const GanttView: React.FC = () => {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   if (!currentProject) {
-    return <div className="p-8 text-center bg-slate-900 border border-slate-800 rounded-xl text-slate-400">Selecione um projeto primeiro.</div>;
+    return (
+      <div className="p-8">
+        <Breadcrumbs
+          title="Diagrama de Gantt & Cronograma"
+          subtitle="Linha do tempo visual de entregas, fases, marcos e responsáveis do projeto"
+        />
+        <div className="p-12 text-center bg-slate-900/80 rounded-2xl border border-slate-800 text-slate-300 max-w-xl mx-auto my-12 space-y-4">
+          <CalendarRange className="w-12 h-12 text-blue-500 mx-auto" />
+          <h3 className="text-xl font-bold text-white">Nenhum projeto selecionado</h3>
+          <p className="text-sm text-slate-400">
+            Para planejar o cronograma no Diagrama de Gantt, cadastre ou selecione um projeto de consultoria.
+          </p>
+          <button
+            onClick={() => setActiveModule('projects')}
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold transition-all shadow-lg shadow-blue-600/20 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Ir para Projetos</span>
+          </button>
+        </div>
+      </div>
+    );
   }
 
   // Calculate timeline bounding dates
@@ -213,7 +244,7 @@ export const GanttView: React.FC = () => {
     }
 
     if (editingTask) {
-      updateTask(editingTask.id, {
+      handleUpdateTask?.(editingTask.id, {
         name: formData.name,
         description: formData.description,
         stage: formData.stage,
@@ -228,8 +259,7 @@ export const GanttView: React.FC = () => {
         isMilestone: formData.isMilestone,
       });
     } else {
-      addTask({
-        projectId: currentProject.id,
+      handleAddTask?.({
         name: formData.name,
         description: formData.description,
         stage: formData.stage,
@@ -254,7 +284,7 @@ export const GanttView: React.FC = () => {
     let newStatus = task.status;
     if (p === 100) newStatus = 'Concluído';
     else if (p > 0 && task.status === 'Não iniciado') newStatus = 'Em andamento';
-    updateTask(taskId, { progressPercent: p, status: newStatus });
+    handleUpdateTask?.(taskId, { progressPercent: p, status: newStatus });
   };
 
   const todayStr = new Date().toISOString().split('T')[0];
@@ -523,7 +553,7 @@ export const GanttView: React.FC = () => {
                             <Edit2 className="w-3 h-3" />
                           </button>
                           <button
-                            onClick={() => duplicateTask(task.id)}
+                            onClick={() => handleDuplicateTask?.(task.id)}
                             className="p-1 text-slate-400 hover:text-blue-400 rounded cursor-pointer"
                             title="Duplicar"
                           >
@@ -747,8 +777,8 @@ export const GanttView: React.FC = () => {
         isOpen={!!deleteConfirmId}
         onClose={() => setDeleteConfirmId(null)}
         onConfirm={() => {
-          if (deleteConfirmId) {
-            deleteTask(deleteConfirmId);
+          if (deleteConfirmId && handleDeleteTask) {
+            handleDeleteTask(deleteConfirmId);
             setDeleteConfirmId(null);
           }
         }}

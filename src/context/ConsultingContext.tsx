@@ -99,6 +99,10 @@ interface ConsultingContextType {
   updateGanttTask: (id: string, task: Partial<GanttTask>) => void;
   deleteGanttTask: (id: string) => void;
   duplicateGanttTask: (id: string) => void;
+  addTask?: (task: Omit<GanttTask, 'id' | 'createdAt' | 'projectId'>) => void;
+  updateTask?: (id: string, task: Partial<GanttTask>) => void;
+  deleteTask?: (id: string) => void;
+  duplicateTask?: (id: string) => void;
 
   // Ishikawa
   ishikawaAnalyses: IshikawaAnalysis[];
@@ -298,6 +302,32 @@ export const getWorkspaceDocId = (groupName: string): string => {
     .replace(/[^a-z0-9]/g, '_');
 };
 
+export const MOCK_PROJECT_IDS = new Set([
+  'proj-1',
+  'proj-2',
+  'proj-demo-1',
+  'proj-g1',
+  'proj-g2',
+  'proj-g3',
+  'proj-g4',
+  'proj-g5',
+  'proj-prof-sup',
+  'proj-alpha-1',
+]);
+
+export const MOCK_CLIENT_IDS = new Set([
+  'client-1',
+  'client-2',
+  'client-3',
+  'cli-g1',
+  'cli-g2',
+  'cli-g3',
+  'cli-g4',
+  'cli-g5',
+  'cli-prof',
+  'cli-alpha-1',
+]);
+
 export const getGroupStoragePrefix = (groupName: string) => {
   const safe = (groupName || 'default').trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
   return `consult_hub_grp_${safe}`;
@@ -317,24 +347,29 @@ export const loadDataForGroup = (groupName: string, userEmail: string = '') => {
       }
     };
 
+    const isMockProj = (projId?: string) => !projId || MOCK_PROJECT_IDS.has(projId);
+
+    const savedProjects = getSaved<Project[]>('projects', []).filter((p) => !MOCK_PROJECT_IDS.has(p.id));
+    const savedClients = getSaved<Client[]>('clients', []).filter((c) => !MOCK_CLIENT_IDS.has(c.id));
+
     return {
-      projects: getSaved<Project[]>('projects', []),
-      clients: getSaved<Client[]>('clients', []),
-      swotItems: getSaved<SwotItem[]>('swot', []),
-      ganttTasks: getSaved<GanttTask[]>('gantt', []),
-      ishikawaAnalyses: getSaved<IshikawaAnalysis[]>('ishikawa', []),
-      actions5W2H: getSaved<Action5W2H[]>('5w2h', []),
-      risks: getSaved<RiskItem[]>('risks', []),
-      paretoItems: getSaved<ParetoItem[]>('pareto', []),
-      pestelItems: getSaved<PestelItem[]>('pestel', []),
-      stakeholders: getSaved<StakeholderItem[]>('stakeholders', []),
-      canvasModels: getSaved<CanvasModel[]>('canvas', []),
-      okrs: getSaved<OkrObjective[]>('okrs', []),
-      climateSurveys: getSaved<ClimateSurvey[]>('climate', []),
-      bscObjectives: getSaved<BSCObjective[]>('bsc_objectives', initialBscObjectives),
-      contracts: getSaved<ConsultingContract[]>('contracts', initialContracts),
-      consultingPlans: getSaved<ConsultingPlan[]>('consulting_plans', []),
-      meetings: getSaved<MeetingSimulation[]>('meetings', initialMeetings),
+      projects: savedProjects,
+      clients: savedClients,
+      swotItems: getSaved<SwotItem[]>('swot', []).filter((s) => !isMockProj(s.projectId)),
+      ganttTasks: getSaved<GanttTask[]>('gantt', []).filter((t) => !isMockProj(t.projectId)),
+      ishikawaAnalyses: getSaved<IshikawaAnalysis[]>('ishikawa', []).filter((i) => !isMockProj(i.projectId)),
+      actions5W2H: getSaved<Action5W2H[]>('5w2h', []).filter((a) => !isMockProj(a.projectId)),
+      risks: getSaved<RiskItem[]>('risks', []).filter((r) => !isMockProj(r.projectId)),
+      paretoItems: getSaved<ParetoItem[]>('pareto', []).filter((p) => !isMockProj(p.projectId)),
+      pestelItems: getSaved<PestelItem[]>('pestel', []).filter((p) => !isMockProj(p.projectId)),
+      stakeholders: getSaved<StakeholderItem[]>('stakeholders', []).filter((s) => !isMockProj(s.projectId)),
+      canvasModels: getSaved<CanvasModel[]>('canvas', []).filter((c) => !isMockProj(c.projectId)),
+      okrs: getSaved<OkrObjective[]>('okrs', []).filter((o) => !isMockProj(o.projectId)),
+      climateSurveys: getSaved<ClimateSurvey[]>('climate', []).filter((c) => !isMockProj(c.projectId)),
+      bscObjectives: getSaved<BSCObjective[]>('bsc_objectives', []).filter((b) => !isMockProj(b.projectId)),
+      contracts: getSaved<ConsultingContract[]>('contracts', []).filter((c) => !isMockProj(c.projectId)),
+      consultingPlans: getSaved<ConsultingPlan[]>('consulting_plans', []).filter((p) => !isMockProj(p.projectId)),
+      meetings: getSaved<MeetingSimulation[]>('meetings', []).filter((m) => !isMockProj(m.projectId)),
       reportConfig: getSaved<ConsultingReportConfig>('report', initialReportConfig),
       settings: (() => {
         const raw = getSaved<AppSettings>('settings', { ...initialSettings, consultancyName: groupName });
@@ -351,7 +386,7 @@ export const loadDataForGroup = (groupName: string, userEmail: string = '') => {
       })(),
     };
   } else {
-    // Generate the single dedicated example project package for the user's group type
+    // Return completely blank workspace package for all users and groups
     return getInitialDataForSpecificGroup(groupName, userEmail);
   }
 };
@@ -392,7 +427,7 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const [activeModule, setActiveModule] = useState<ModuleId>('dashboard');
   const [currentProjectId, setCurrentProjectId] = useState<string>(() => {
-    return initialGroupData.projects[0]?.id || 'proj-1';
+    return initialGroupData.projects[0]?.id || '';
   });
 
   // Core entities
@@ -409,10 +444,10 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [canvasModels, setCanvasModels] = useState<CanvasModel[]>(initialGroupData.canvasModels);
   const [okrs, setOkrs] = useState<OkrObjective[]>(initialGroupData.okrs);
   const [climateSurveys, setClimateSurveys] = useState<ClimateSurvey[]>(initialGroupData.climateSurveys);
-  const [bscObjectives, setBscObjectives] = useState<BSCObjective[]>(initialGroupData.bscObjectives || initialBscObjectives);
-  const [contracts, setContracts] = useState<ConsultingContract[]>(initialGroupData.contracts || initialContracts);
+  const [bscObjectives, setBscObjectives] = useState<BSCObjective[]>(initialGroupData.bscObjectives || []);
+  const [contracts, setContracts] = useState<ConsultingContract[]>(initialGroupData.contracts || []);
   const [consultingPlans, setConsultingPlans] = useState<ConsultingPlan[]>((initialGroupData as any).consultingPlans || []);
-  const [meetings, setMeetings] = useState<MeetingSimulation[]>(initialGroupData.meetings || initialMeetings);
+  const [meetings, setMeetings] = useState<MeetingSimulation[]>(initialGroupData.meetings || []);
   const [selectedClimateSurveyId, setSelectedClimateSurveyId] = useState<string | null>(null);
   const [reportConfig, setReportConfig] = useState<ConsultingReportConfig>(initialGroupData.reportConfig);
   const [settings, setSettings] = useState<AppSettings>(initialGroupData.settings);
@@ -460,23 +495,31 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           if (remoteTime > lastLocalWriteTimeRef.current + 150) {
             isRemoteUpdateRef.current = true;
 
-            if (Array.isArray(remoteData.projects)) setProjects(remoteData.projects);
-            if (Array.isArray(remoteData.clients)) setClients(remoteData.clients);
-            if (Array.isArray(remoteData.swotItems)) setSwotItems(remoteData.swotItems);
-            if (Array.isArray(remoteData.ganttTasks)) setGanttTasks(remoteData.ganttTasks);
-            if (Array.isArray(remoteData.ishikawaAnalyses)) setIshikawaAnalyses(remoteData.ishikawaAnalyses);
-            if (Array.isArray(remoteData.actions5W2H)) setActions5W2H(remoteData.actions5W2H);
-            if (Array.isArray(remoteData.risks)) setRisks(remoteData.risks);
-            if (Array.isArray(remoteData.paretoItems)) setParetoItems(remoteData.paretoItems);
-            if (Array.isArray(remoteData.pestelItems)) setPestelItems(remoteData.pestelItems);
-            if (Array.isArray(remoteData.stakeholders)) setStakeholders(remoteData.stakeholders);
-            if (Array.isArray(remoteData.canvasModels)) setCanvasModels(remoteData.canvasModels);
-            if (Array.isArray(remoteData.okrs)) setOkrs(remoteData.okrs);
-            if (Array.isArray(remoteData.climateSurveys)) setClimateSurveys(remoteData.climateSurveys);
-            if (Array.isArray(remoteData.bscObjectives)) setBscObjectives(remoteData.bscObjectives);
-            if (Array.isArray(remoteData.contracts)) setContracts(remoteData.contracts);
-            if (Array.isArray(remoteData.consultingPlans)) setConsultingPlans(remoteData.consultingPlans);
-            if (Array.isArray(remoteData.meetings)) setMeetings(remoteData.meetings);
+            const isMockProj = (projId?: string) => !projId || MOCK_PROJECT_IDS.has(projId);
+            const cleanRemoteProjects = (Array.isArray(remoteData.projects) ? remoteData.projects : []).filter(
+              (p: Project) => !MOCK_PROJECT_IDS.has(p.id)
+            );
+            const cleanRemoteClients = (Array.isArray(remoteData.clients) ? remoteData.clients : []).filter(
+              (c: Client) => !MOCK_CLIENT_IDS.has(c.id)
+            );
+
+            setProjects(cleanRemoteProjects);
+            setClients(cleanRemoteClients);
+            if (Array.isArray(remoteData.swotItems)) setSwotItems(remoteData.swotItems.filter((i: SwotItem) => !isMockProj(i.projectId)));
+            if (Array.isArray(remoteData.ganttTasks)) setGanttTasks(remoteData.ganttTasks.filter((t: GanttTask) => !isMockProj(t.projectId)));
+            if (Array.isArray(remoteData.ishikawaAnalyses)) setIshikawaAnalyses(remoteData.ishikawaAnalyses.filter((i: IshikawaAnalysis) => !isMockProj(i.projectId)));
+            if (Array.isArray(remoteData.actions5W2H)) setActions5W2H(remoteData.actions5W2H.filter((a: Action5W2H) => !isMockProj(a.projectId)));
+            if (Array.isArray(remoteData.risks)) setRisks(remoteData.risks.filter((r: RiskItem) => !isMockProj(r.projectId)));
+            if (Array.isArray(remoteData.paretoItems)) setParetoItems(remoteData.paretoItems.filter((p: ParetoItem) => !isMockProj(p.projectId)));
+            if (Array.isArray(remoteData.pestelItems)) setPestelItems(remoteData.pestelItems.filter((p: PestelItem) => !isMockProj(p.projectId)));
+            if (Array.isArray(remoteData.stakeholders)) setStakeholders(remoteData.stakeholders.filter((s: StakeholderItem) => !isMockProj(s.projectId)));
+            if (Array.isArray(remoteData.canvasModels)) setCanvasModels(remoteData.canvasModels.filter((c: CanvasModel) => !isMockProj(c.projectId)));
+            if (Array.isArray(remoteData.okrs)) setOkrs(remoteData.okrs.filter((o: OkrObjective) => !isMockProj(o.projectId)));
+            if (Array.isArray(remoteData.climateSurveys)) setClimateSurveys(remoteData.climateSurveys.filter((c: ClimateSurvey) => !isMockProj(c.projectId)));
+            if (Array.isArray(remoteData.bscObjectives)) setBscObjectives(remoteData.bscObjectives.filter((b: BSCObjective) => !isMockProj(b.projectId)));
+            if (Array.isArray(remoteData.contracts)) setContracts(remoteData.contracts.filter((c: ConsultingContract) => !isMockProj(c.projectId)));
+            if (Array.isArray(remoteData.consultingPlans)) setConsultingPlans(remoteData.consultingPlans.filter((p: ConsultingPlan) => !isMockProj(p.projectId)));
+            if (Array.isArray(remoteData.meetings)) setMeetings(remoteData.meetings.filter((m: MeetingSimulation) => !isMockProj(m.projectId)));
             if (remoteData.reportConfig) setReportConfig(remoteData.reportConfig);
             if (remoteData.settings) setSettings(remoteData.settings);
 
@@ -778,7 +821,8 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const keys = [
       'initialized', 'projects', 'clients', 'swot', 'gantt', 'ishikawa',
       '5w2h', 'risks', 'pareto', 'pestel', 'stakeholders', 'canvas',
-      'okrs', 'climate', 'report', 'settings'
+      'okrs', 'climate', 'bsc_objectives', 'contracts', 'consulting_plans',
+      'meetings', 'report', 'settings'
     ];
     keys.forEach((k) => localStorage.removeItem(`${prefix}_${k}`));
     showToast(`Dados do grupo "${groupName}" foram limpos.`, 'info');
@@ -786,9 +830,8 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const cleanCurrentGroupData = () => {
     if (!currentUser?.group) return;
-    const clean = loadDataForGroup('', currentUser.email);
-    setProjects(clean.projects);
-    setClients(clean.clients);
+    setProjects([]);
+    setClients([]);
     setSwotItems([]);
     setGanttTasks([]);
     setIshikawaAnalyses([]);
@@ -800,10 +843,13 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setCanvasModels([]);
     setOkrs([]);
     setClimateSurveys([]);
-    if (clean.projects.length > 0) {
-      setCurrentProjectId(clean.projects[0].id);
-    }
-    showToast(`Ambiente do grupo "${currentUser.group}" reiniciado e limpo!`, 'info');
+    setBscObjectives([]);
+    setContracts([]);
+    setConsultingPlans([]);
+    setMeetings([]);
+    setCurrentProjectId('');
+    deleteGroupData(currentUser.group);
+    showToast(`Ambiente do grupo "${currentUser.group}" limpo com sucesso!`, 'info');
   };
 
   // Derived current project
@@ -1141,16 +1187,12 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const deleteProject = (id: string) => {
-    if (projects.length <= 1) {
-      showToast('Não é possível excluir o único projeto restante.', 'warning');
-      return;
-    }
     const remaining = projects.filter((p) => p.id !== id);
     setProjects(remaining);
 
     // Fallback current project if active project was deleted
-    if (currentProjectId === id && remaining.length > 0) {
-      setCurrentProjectId(remaining[0].id);
+    if (currentProjectId === id) {
+      setCurrentProjectId(remaining.length > 0 ? remaining[0].id : '');
     }
 
     // Clean associated items across all modules
@@ -1280,12 +1322,12 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     if (!orig) return;
     const dup: GanttTask = {
       ...orig,
-      id: `task-${Date.now()}`,
+      id: `task-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
       name: `${orig.name} (Cópia)`,
       createdAt: new Date().toISOString(),
     };
     setGanttTasks((prev) => [...prev, dup]);
-    showToast('Tarefa duplicada.');
+    showToast(`Tarefa "${orig.name}" duplicada.`);
   };
 
   // Ishikawa
@@ -2335,6 +2377,10 @@ export const ConsultingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         updateGanttTask,
         deleteGanttTask,
         duplicateGanttTask,
+        addTask: addGanttTask,
+        updateTask: updateGanttTask,
+        deleteTask: deleteGanttTask,
+        duplicateTask: duplicateGanttTask,
 
         ishikawaAnalyses,
         currentProjectIshikawa,
